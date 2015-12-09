@@ -1,0 +1,101 @@
+SamurAI 3x3 Game Manager (2015-11-24)
+
+This directory should contain the source code and sample setting of the
+SamurAI 3x3 game management system and several sample players.
+
+1. Reporting Problems or Requesting Improvements
+
+When you find any problems with this system, please send an e-mail
+directed to the following.
+	 mailto:samurai2015-contact@ipsj.or.jp
+Requests for improvements of the system can also be sent to the above
+address.
+
+2. Installation
+
+The system is written in C++ and is meant to be compatible with C++11
+standard.  Simply issueing "make all" should work on many systems, but
+you possibly have to modify first several lines of Makefile in
+subdirectories "manager" and "players".
+
+As the system has only be tested with g++ 4.9.2 under Linux and
+Cygwin, it might not work on other systems.  Reports about
+working/non-working systems are most welcome.
+
+3. Game Manager
+
+The game manager system is in the subdirectory "manager".  By the
+installation procedure, an executable file with its name "gameManager"
+should result in this subdirectory, which is the main program of the
+game management system.
+
+4. Running the System
+
+The game manager reads in the game setting information from the
+standard input and writes out a game log to the standard output.
+The game log can be graphically visualized by a separate visualizer.
+
+Sample setting files are in the subdirectory "setting".  You may have
+to edit several items in them to fit your environment.  Please read
+the "README" file in the "setting" subdirectory.
+
+A typical command line to invoke the system would be as follows.
+   # manager/gameManager <setting/setting >logfile
+
+A number of options can be specified on running the game manager.
+
+  -h: help
+  -a<path>: outputs AI program interface message log
+    Messages sent to player N are also recorded in a file with its
+    name obtained by concatenating <path> and N.
+    For example, if you specify "-ainput", then files with names
+    "input0" through "input5" are made.
+    This option is useful for debugging your player AI program.
+    After running the game manager as specified above with this option,
+    you can debug your AI program separately passing the message log
+    obtained to its standard input.
+  -d: dump game process
+    This option is mainly for debugging the game management system.
+  -D<path>: dump game process to the specified path
+  -r: game result report output
+    Currently this option is not supported.
+    This option is planned to be used when the game system is
+    run as a part of tournament management system.
+
+5. Sample Players
+
+Players are individual executable programs which are invoked from the
+game management system.  Some sample players are provided in the
+subdirectory "players".
+
+  randomPlayer: chooses actions randomly.
+  greedyPlayer: tries to occupy as many sections as possible with very
+    shallow search.
+
+These two players, especially the greedyPlayer, can be a good start
+point for writing your own player.  You may be surprised when you look
+into its source code "greedyPlayer.cpp", as it contains only four
+constants.
+
+The main program and several functions are in "players.cpp", which is
+used commonly in all the sample players.  An object of class "Player"
+is responsible for deciding the action of the samurai.  Different
+sample players only define different subclasses of the class "Player".
+
+The search code is in "planning.cpp", which defines the class
+"PlanningPlayer", a subclass of the class "Player".  This
+"PlanningPlayer" tries to maximize some evaluation function by
+choosing appropriate actions, and the four constants declared in the
+file "greedyplayer.cpp" are weights for different aspects of the
+result of actions.  You can describe a slightly different player by
+simply changing these weights.  For example, if you make
+"hurtingMerits" larger, your samurai will try more to occupy the
+section where an opponent samurai is.  If you make "hidingMerits"
+larger, your samurai prefer to hide itself.
+
+There are several other sample players, which are intended for
+testing the management system in handling misbehaving players.
+
+  timeoutPlayer: won't respond quickly enough.
+  tooActivePlayer: specifies too many actions.
+  nonCheckingPlayer: occasionally specifies invalid actions.

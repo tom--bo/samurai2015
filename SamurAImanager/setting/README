@@ -1,0 +1,114 @@
+SamurAI 3x3 Setting Files (2015-11-24)
+
+This document describes the format of game setting information files
+for SamurAI 3x3 game managemenet sytem.
+
+There are three kinds of files in this directory.
+
+One is setting files, that specify general setting of a game.  Second
+is samurai database files, that specify program names and invocation
+method for samurai player AI.  The last one is score database files
+that contain score so far of samurai participating in a multi-game
+tournament.
+
+When you use the SamurAI 3x3 game manager, most parts of the setting
+information files should be left as they are, but several items have
+to be modified.  Items marked with <***> have to be edited to test
+your AI players.  Items marked <**> might need some change depending
+on your envoronment.
+
+A sample setting should be found in the files "setting",
+"samuraidb.txt", and "scoredb.txt" in the same directory.
+
+1. Setting file
+
+The setting file contains general game setting information to be read
+in from the standard input by the SamurAI 3x3 game manager.
+
+Usually, users do not have to change the contents of this file.
+
+All the lines beginning from a sharp sign ("#") are comments.
+
+1.1 Samurai Database Path <***>
+
+The first non-comment line should have a string denoting the file path
+to the samurai database.  Details of this file are found in a separate
+section below.
+
+1.2 Score Database Path <***>
+
+Next comes a string denoting the file path to the score database.
+Again, details are found in a separate section.
+
+1.3 Game Name and Game Parameters
+
+Next come overall game information.
+
+First comes the game name string.  This may be used by the game
+visualizer as the game name.
+
+Then come 5 numbers giving, the total number of turns in the game,
+time limit in milliseconds for the AI player programs, width and
+height of the battlefield, and finally, the turns required for an
+injured samurai to recover.
+
+1.4 Number of Samurai in Armies
+
+Then comes two numbers, which are numbers of samurai in each of the
+army.  The current version of the game manager cannot handle but 3 for
+both.
+
+1.5 Samurai Info
+
+Finally, information on 6 samurai is given.  The following are given
+for each of the six samurai.
+
+First comes the information on occupied secions at an occupy action.
+The first number is the number of sections occupied, and the
+coordinates of the occupied sections, relative to the position of the
+samurai, follow.
+
+Then comes visiual ability, that specifies the Manhattan distance
+from the samurai's position within which information of the
+battlefield sections is obtained.
+
+Next comes activity budget.  The total of costs of actions in one turn
+should not exceed this value.
+
+Next comes two numbers specifying the home position of the samurai.
+
+2. Samurai Database File <***>
+
+Samurai database file describes the samurai names, their player AI
+program paths, and how to invoke them.
+
+All the lines beginning from a sharp sign ("#") are comments in this
+file, too.
+
+First comes the number of samurai, which is usually 6.
+
+Then comes a string of the path to the directory where player AI
+program files are stored.
+
+Finally, comes information on all samurai, described as three
+strings.
+
+The first string is the name of the samurai, which may be used by the
+visualizer.
+
+The next string is the name of the AI program for the samurai.
+
+The final string specifies how the program is invoked.  The sequence
+"$1" in the string is substituted by the path to the program, that is,
+if the directory path is "player", the player program file name is
+"musashi", and the invocation string is simply "$1", the program will
+be invoked by a command "player/musashi".  Thus, if the program is
+stored as an executable, this invocation string is simply "$1".  If
+the AI program is a Java program compiled into "Musashi.class", then
+the program name and invocation string may be "Musashi" and "java $1".
+
+3. Score Database File
+
+Score database files are records for scores so far in a multi-game
+tounament of each samurai.  It has six numbers, which are the total
+scores of six samurai participating in the game.

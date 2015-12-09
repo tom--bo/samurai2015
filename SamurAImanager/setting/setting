@@ -1,0 +1,40 @@
+### Game Setting ###
+# Samurai Database Path
+"setting/samuraidb.txt"
+# Score Database Path
+"setting/scoredb.txt"
+# Game name, total turns, think time, width, height, cure turns
+"Test Match" 192 100 15 15 20
+# 3 samurai in both armies
+3 3
+## Samurai Info
+## Samurai 0
+# Occupation
+4 0 1 0 2 0 3 0 4
+# Vision, activity, homeX, homeY
+5 7 0 5
+## Samurai 1
+# Occupation
+5 0 1 0 2 1 0 1 1 2 0
+# Vision, activity, homeX, homeY
+5 7 0 14
+## Samurai 2
+# Occupation
+7 -1 -1 -1 0 -1 1 0 1 1 -1 1 0 1 1
+# Vision, activity, homeX, homeY
+5 7 9 14
+## Samurai 3
+# Occupation
+4 0 1 0 2 0 3 0 4
+# Vision, activity, homeX, homeY
+5 7 14 9
+## Samurai 4
+# Occupation
+5 0 1 0 2 1 0 1 1 2 0
+# Vision, activity, homeX, homeY
+5 7 14 0
+## Samurai 5
+# Occupation
+7 -1 -1 -1 0 -1 1 0 1 1 -1 1 0 1 1
+# Vision, activity, memory, homeX, homeY
+5 7 5 0

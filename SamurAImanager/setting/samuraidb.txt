@@ -1,0 +1,9 @@
+# Samurai Database
+6
+"players/"
+"Masamune" "greedyPlayer" "$1"
+"Kenshin" "greedyPlayer" "$1"
+"Shingen" "nonCheckingPlayer" "$1"
+"Ujiyasu" "randomPlayer" "$1"
+"Nagamasa" "tooActivePlayer" "$1"
+"Yoshikage" "timeoutPlayer" "$1"
