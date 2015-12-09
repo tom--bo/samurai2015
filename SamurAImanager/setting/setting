@@ -4,7 +4,7 @@
 # Score Database Path
 "setting/scoredb.txt"
 # Game name, total turns, think time, width, height, cure turns
-"Test Match" 192 100 15 15 20
+"Test Match" 192 100000 15 15 20
 # 3 samurai in both armies
 3 3
 ## Samurai Info
