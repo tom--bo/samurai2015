@@ -223,70 +223,71 @@ void GameInfo::tryAction
     territory = selfTerritory = injury = hiding = 0;
     switch (action) {
         case 1: case 2: case 3: case 4: { // occupation
-                static const int size[3] = {4, 5, 7};
-                static const int ox[3][7] = {
-                    {0, 0, 0, 0, 0, 0, 0},
-                    {0, 0, 1, 1, 2, 0, 0},
-                    {-1,-1,-1,0,1,1,1}};
-                static const int oy[3][7] = {
-                    {1, 2, 3, 4},
-                    {1, 2, 0, 1, 0},
-                    {-1,0,1,1,-1,0,1}};
-                for (int k = 0; k != size[weapon]; k++) {
-                    int x, y;
-                    rotate(action-1, ox[weapon][k], oy[weapon][k], x, y);
-                    x += me.curX; y += me.curY;
-                    if (0 <= x && x < width && 0 <= y && y < height) {
-                        bool isHome = false;
-                        for (int s = 0; s != 6; s++) {
-                            SamuraiInfo& si = samuraiInfo[s];
-                            if (si.homeX == x && si.homeY == y) {
-                                // Cannot occupy home positions
-                                isHome = true;
-                                break;
-                            }
-                        }
-                        if (!isHome) {
-                            int pos = y*width+x;
-                            int current = field[pos];
-                            if (current != weapon) {
-                                selfTerritory += 1;
-                                if (current < 0) {	// unoccupied
-                                    territory += 1;
-                                } else if (current >= 3) { // opponents' territory
-                                    territory += 2;
-                                }
-                                for (int s = 3; s != 6; s++) {
-                                    SamuraiInfo& si = samuraiInfo[s];
-                                    if (si.curX == x && si.curY == y) {
-                                        undo.recSamurai(&si);
-                                        si.curX = si.homeX;
-                                        si.curY = si.homeY;
-                                        injury++;
-                                        si.hidden = 0;
-                                    }
-                                }
-                                undo.recField(&field[pos]);
-                            }
+            static const int size[3] = {4, 5, 7};
+            static const int ox[3][7] = {
+                {0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 1, 1, 2, 0, 0},
+                {-1,-1,-1,0,1,1,1}};
+            static const int oy[3][7] = {
+                {1, 2, 3, 4},
+                {1, 2, 0, 1, 0},
+                {-1,0,1,1,-1,0,1}};
+            for (int k = 0; k != size[weapon]; k++) {
+                int x, y;
+                rotate(action-1, ox[weapon][k], oy[weapon][k], x, y);
+                x += me.curX; y += me.curY;
+                if (0 <= x && x < width && 0 <= y && y < height) {
+                    bool isHome = false;
+                    for (int s = 0; s != 6; s++) {
+                        SamuraiInfo& si = samuraiInfo[s];
+                        if (si.homeX == x && si.homeY == y) {
+                            // Cannot occupy home positions
+                            isHome = true;
+                            break;
                         }
                     }
+                    if (!isHome) {
+                        int pos = y*width+x;
+                        int current = field[pos];
+                        if (current != weapon) {
+                            selfTerritory += 1;
+                            if (current < 0) {    // unoccupied
+                                territory += 1;
+                            } else if (current >= 3) { // opponents' territory
+                                territory += 2;
+                            }
+                            undo.recField(&field[pos]);
+                        }
+                        for (int s = 3; s != 6; s++) {
+                            SamuraiInfo& si = samuraiInfo[s];
+                            if (si.curX == x && si.curY == y) {
+                                undo.recSamurai(&si);
+                                si.curX = si.homeX;
+                                si.curY = si.homeY;
+                                injury++;
+                                si.hidden = 0;
+                            }
+                        }
+
+                    }
                 }
-                break;
             }
+            break;
+        }
         case 5: case 6: case 7: case 8: {
-                static const int dx[] = { 0, 1, 0, -1 };
-                static const int dy[] = { 1, 0, -1, 0 };
-                undo.recSamurai(&me);
-                me.curX += dx[action-5];
-                me.curY += dy[action-5];
-                break;
-            }
-        case 9:			// hide
+            static const int dx[] = { 0, 1, 0, -1 };
+            static const int dy[] = { 1, 0, -1, 0 };
+            undo.recSamurai(&me);
+            me.curX += dx[action-5];
+            me.curY += dy[action-5];
+            break;
+        }
+        case 9:            // hide
             undo.recSamurai(&me);
             me.hidden = 1;
             hiding += 1;
             break;
-        case 10:			// appear
+        case 10:            // appear
             undo.recSamurai(&me);
             me.hidden = 0;
             hiding -= 1;
