@@ -4,6 +4,6 @@
 "Masamune" "greedyPlayer0" "$1"
 "Kenshin" "greedyPlayer1" "$1"
 "Shingen" "greedyPlayer2" "$1"
-"Ujiyasu" "greedyPlayer0" "$1"
+"Ujiyasu" "greedyPlayer1" "$1"
 "Nagamasa" "greedyPlayer1" "$1"
-"Yoshikage" "greedyPlayer2" "$1"
+"Yoshikage" "greedyPlayer1" "$1"
