@@ -1,4 +1,4 @@
-double territoryMerits = 0.3;
-double selfTerritoryMerits = 1;
-double hurtingMerits = 0.5;
+double territoryMerits = 1;
+double selfTerritoryMerits = 0.3;
+double hurtingMerits = 100;
 double hidingMerits = 1;

@@ -216,9 +216,7 @@ void Undo::apply() {
     for (SamuraiUndo& u: samuraiUndo) u.apply();
 }
 
-void GameInfo::tryAction
-(int action, Undo& undo, 
- int& territory, int& selfTerritory, int& injury, int& hiding) {
+void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerritory, int& injury, int& hiding) {
     SamuraiInfo& me = samuraiInfo[weapon];
     territory = selfTerritory = injury = hiding = 0;
     switch (action) {
