@@ -2,7 +2,7 @@ CPPFLAGS= -pthread -std=c++11 -g
 CPP= c++
 
 OBJECTS= main.o battlefield.o game.o \
-	commentedStream.o samurai.o errors.o
+	commentedStream.o errors.o
 
 TARGET= gameManager
 

@@ -16,4 +16,3 @@ clean:
 	rm -f TAGS *~
 	cd manager; make clean
 	cd players; make clean
-	cd setting; make clean

@@ -1,49 +1,44 @@
 #include "samurai.hpp"
 #include <thread>
 
-CommentedIStream::CommentedIStream(istream &is):
-  is(&is), commentChar('#') {
+SamuraiScanner::SamuraiScanner() {}
+
+SamuraiScanner::SamuraiScanner(FILE* in):
+  input(in), commentChar('#') {
 }
 
-int CommentedIStream::get() {
-  return is->get();
-}
-
-bool CommentedIStream::good() {
-  return is->good();
-}
-
-void CommentedIStream::skipComments() {
-  char c = get();
+void SamuraiScanner::skipComments() {
+  char c = fgetc(input);
   while (isspace(c) || c == commentChar) {
     if (c == commentChar) {
       do {
-	c = get();
+	c = fgetc(input);
       } while (c != '\n');
     } else {
-      c = get();
+      c = fgetc(input);
     }
   }
-  is->unget();
+  ungetc(c, input);
 }
 
-CommentedIStream& operator>>(CommentedIStream &cs, int &i) {
-  cs.skipComments();
-  *cs.is >> i;
-  return cs;
+int SamuraiScanner::get() {
+  skipComments();
+  int value;
+  if (fscanf(input, "%d", &value) != 1) return -99999;
+  return value;
 }
 
-CommentedIStream& operator>>(CommentedIStream& cs, string& str) {
-  cs.skipComments();
-  for (char c = cs.get(); c != '"'; c = cs.get()) {
+string SamuraiScanner::gets() {
+  skipComments();
+  for (char c = fgetc(input); c != '"'; c = fgetc(input)) {
     if (!isspace(c)) {
       throw ErrorReport(string("Character '") + c + 
 			"' found where a string literal is expected");
     }
   }
-  str = "";
-  for (char c = cs.get(); c != '"'; c = cs.get()) {
+  string str = "";
+  for (char c = fgetc(input); c != '"'; c = fgetc(input)) {
     str += c;
   }
-  return cs;
+  return str;
 }

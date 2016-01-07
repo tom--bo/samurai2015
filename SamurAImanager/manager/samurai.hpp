@@ -1,6 +1,4 @@
-#include <iostream>
-#include <fstream>
-#include <sstream>
+#include <cstdio>
 #include <unordered_map>
 #include <queue>
 #include <limits>
@@ -15,19 +13,15 @@
 
 using namespace std;
 
-struct CommentedIStream {
-  istream* is;
+struct SamuraiScanner {
+  FILE* input;
   char commentChar;
-  CommentedIStream() {};
-  CommentedIStream(istream &is);
-  bool good();
-  int get();
   void skipComments();
+  SamuraiScanner();
+  SamuraiScanner(FILE* in);
+  int get();
+  string gets();
 };
-
-CommentedIStream& operator>>(CommentedIStream& cs, int& i);
-
-CommentedIStream& operator>>(CommentedIStream& cs, string& str);
 
 struct ErrorReport {
   string msg;
@@ -38,6 +32,7 @@ struct Coordinates {
   const int x;
   const int y;
   Coordinates(int x, int y);
+  Coordinates(const int xy[]);
   Coordinates north() const;
   Coordinates south() const;
   Coordinates east() const;
@@ -47,8 +42,6 @@ struct Coordinates {
   string toString() const;
   bool operator==(const Coordinates another) const;
 };
-
-CommentedIStream& operator>>(CommentedIStream& cs, Coordinates& coords);
 
 struct CoordHash {
   size_t operator()(const Coordinates& c) const;
@@ -78,60 +71,56 @@ struct Section {
 };
 
 struct BattleField {
-  const int width;
-  const int height;
+  const int width = 15;
+  const int height = 15;
   FieldMap map;
-  BattleField(int w, int h);
+  BattleField();
   Section* section(int x, int y);
   void occupy(GameState& state, Role& role, int direction, Section& pos);
 };
 
-struct Samurai {
-  // Permanent info
-  string name;
-  string progname;
-  string invocation;
-  // Tournament state info
-  int score;
-  int rank;
-  Samurai() {};
-  Samurai(CommentedIStream& cs);
-  void readScore(CommentedIStream& ss);
-};
-
-struct SamuraiDB {
-  int numSamurai;
-  string programDir;
-  Samurai *samuraiList;
-  SamuraiDB();
-  SamuraiDB(string samuraiDBname, string scoreDBname);
-};
-
 struct Role {
-  const int id;
+  int id;
   vector <Coordinates> reach;
-  int vision;
-  int activity;
+  const int vision = 5;
+  const int activity = 7;
   int homeX;
   int homeY;
-  Role(int id, CommentedIStream& cs);
+  void init(int id);
+};
+
+const Coordinates homePositions[6] = {
+  Coordinates( 0, 5),
+  Coordinates( 0, 14),
+  Coordinates( 9, 14),
+  Coordinates(14, 9),
+  Coordinates(14, 0),
+  Coordinates( 5, 0)
+};
+
+const int weaponReachSize[3] = { 4, 5, 7 };
+const int weaponReach[3][7][2] = {
+  // Spear
+  { {0, 1}, {0, 2}, {0, 3}, {0, 4} },
+  // Swords
+  { {0, 1}, {0, 2}, {1, 0}, {1, 1}, {2, 0} },
+  // Battleax
+  { {-1, -1}, {-1, 0}, {-1, 1}, {0, 1}, {1, -1}, {1, 0}, {1, 1} }
 };
 
 struct Setting {
-  string gameName;
-  int turns;
-  int timeAllowed;
-  int width;
-  int height;
-  int cureTurns;
-  SamuraiDB samuraiDB;
-  vector<Role> roles[2];
-  Setting(CommentedIStream &cs);
-  void sendSettingInfo(ostream& os, const int weapon);
+  const string gameName = string("SamurAI 3x3");
+  const int turns = 192;
+  const int initTimeAllowed = 5000;
+  const int timeAllowed = 100;
+  const int cureTurns = 20;
+  const int armySize = 3;
+  Role roles[6];
+  void sendSettingInfo(FILE* os, const int weapon);
+  Setting();
 };
 
 struct SamuraiState {
-  Samurai* samurai;
   Role* role;
   int side;
   int weapon;
@@ -139,48 +128,46 @@ struct SamuraiState {
   int curePeriod;
   bool hidden;
   pid_t processId;
-  string dirname;
-  string toAIpath;
-  string fromAIpath;
-  ostream* toAI;
-  CommentedIStream fromAI;
+  string invokeCommand;
+  string pauseCommand;
+  string resumeCommand;
+  string nickname = "noname";
+  int score = 0;
+  int rank = 0;
+  FILE* comlog = nullptr;
+  FILE* toAI = nullptr;
+  SamuraiScanner fromAI;
   bool alive;
   int response;
   bool done;
   queue<int> actions;
-  void init(Setting& setting, BattleField& field, int id, int side, int weapon);
-  bool move(GameState& state, int direction, ostream& comments);
-  bool occupy(GameState& state, int direction, ostream& comments);
-  bool hide(ostream& comments);
-  bool appear(ostream& comments);
+  void init(Setting& setting, BattleField& field, int id);
+  bool move(GameState& state, int direction, string& comments);
+  bool occupy(GameState& state, int direction, string& comments);
+  bool hide(string& comments);
+  bool appear(string& comments);
   void cure();
   void house(BattleField& field);
   void die(BattleField& field);
   void injure(BattleField& field, Setting& setting);
 };
   
+extern SamuraiState samuraiStates[6];
+
 struct GameState {
   Setting setting;
   BattleField battleField;
   int turn;
-  SamuraiState* samuraiStates[2];
-  GameState(Setting& stng, int players[]);
-  void sendGameInfo(ostream& os, const int side, const int weapon);
-  void sendTurnInfo(ostream& os, const int side, const int weapon);
+  void init();
+  void sendGameInfo(FILE* os, const int id);
+  void sendTurnInfo(FILE* os, const int side, const int weapon);
   void receiveActionCommands
-  (CommentedIStream& is, const int side, const int weapon, ostream& log);
+  (SamuraiScanner& is, const int side, const int weapon, FILE* log);
 };
 
-ostream& operator<<(ostream& os, const Coordinates& coord);
-ostream& operator<<(ostream& os, const Role& role);
-ostream& operator<<(ostream& os, const Setting& setting);
-ostream& operator<<(ostream& os, const SamuraiDB& db);
-
-void receiveFromAI(CommentedIStream& is, const Setting& setting,
+void receiveFromAI(SamuraiScanner& is, const Setting& setting,
 		   GameState& gameState, const int side, const int weapon,
-		   ostream& log, int turn);
+		   FILE* log, int turn);
 
-extern bool dump;
-extern ostream* ds;
-extern bool logif;
-extern ofstream ifs[];
+extern FILE* dump;
+extern FILE** ifs;

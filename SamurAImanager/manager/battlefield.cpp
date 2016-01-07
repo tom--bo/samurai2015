@@ -1,6 +1,7 @@
 #include "samurai.hpp"
 
-Coordinates::Coordinates(const int x, const int y): x(x), y(y) {}
+Coordinates::Coordinates(int x, int y): x(x), y(y) {}
+Coordinates::Coordinates(const int xy[]): x(xy[0]), y(xy[1]) {}
 Coordinates Coordinates::north() const { return Coordinates(x, y-1); }
 Coordinates Coordinates::south() const { return Coordinates(x, y+1); }
 Coordinates Coordinates::east() const { return Coordinates(x+1, y); }
@@ -31,9 +32,9 @@ Coordinates Coordinates::rotate(const int direction) const {
 }
 
 string Coordinates::toString() const {
-  ostringstream os;
-  os << "(" << x << "," << y << ")";
-  return os.str();
+  char buf[256];
+  snprintf(buf, sizeof(buf), "(%d,%d)", x, y);
+  return string(buf);
 }
 
 Section* FieldMap::locate(Coordinates p) {
@@ -60,18 +61,13 @@ void Section::leave(SamuraiState* s) {
 }
 void Section::arrive(SamuraiState* s) {
   population += 1;
-  if (!s->hidden) {
-    if (apparent != 0)
-      throw ErrorReport("Moving to an already filled section " 
-			+ coords.toString());
-    apparent = s;
-  }
+  if (!s->hidden) apparent = s;
 }
 void Section::occupy(Role& role) {
   state = role.id;
 }
 
-BattleField::BattleField(int w, int h): width(w), height(h) {
+BattleField::BattleField() {
   for (int x = 0; x != width; x++) {
     for (int y = 0; y != height; y++) {
       Coordinates coords(x, y);
@@ -93,23 +89,30 @@ void BattleField::occupy
   for (Coordinates& c: role.reach) {
     Section* section = map.locate(p+c.rotate(direction));
     if (section != 0) {
+      for (int s = 0; s != 6; s++) {
+	if (homePositions[s]==section->coords) {
+	  goto ISHOME;
+	}
+      }
       if (section->population != 0) {
-	int a = 1-role.id/3;
+	int a = 3*(1-role.id/3);
 	for (int w = 0; w != 3; w++) {
-	  SamuraiState& ss = state.samuraiStates[a][w];
+	  SamuraiState& ss = samuraiStates[a+w];
 	  if (ss.position == section) {
 	    if (dump)
-	      *ds << "Samurai " << ss.side << "." << ss.weapon 
-		  << " injured" << endl;
+	      fprintf(dump,
+		      "Samurai %d.%d injured\n",
+		      ss.side, ss.weapon);
 	    ss.injure(state.battleField, state.setting);
 	  }
 	}
       }
       section->occupy(role);
       if (dump) {
-	*ds << "Section " << section->coords.toString() 
-	    << " occupied by " << role.id << endl;
+	fprintf(dump, "Section (%d,%d) occupied by %d\n",
+		section->coords.x, section->coords.y, role.id);
       }
     }
+  ISHOME:;
   }
 }

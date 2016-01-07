@@ -2,146 +2,143 @@
 #include <thread>
 #include <signal.h>
 
-Role::Role(int id, CommentedIStream& cs): id(id) {
+void Role::init(int id) {
+  this->id = id;
   int reachSize;
-  cs >> reachSize;
-  for (int k = 0; k != reachSize; k++) {
-    int x, y;
-    cs >> x >> y;
-    reach.emplace_back(Coordinates(x, y));
+  int weapon = id%3;
+  reachSize = weaponReachSize[id%3];
+  for (int r = 0; r != weaponReachSize[weapon]; r++) {
+    reach.push_back(Coordinates(weaponReach[weapon][r]));
   }
-  cs >> vision >> activity >> homeX >> homeY;
+  homeX = homePositions[id].x;
+  homeY = homePositions[id].y;
 }
 
-Setting::Setting(CommentedIStream &cs) {
-  string samuraiDBname;
-  string scoreDBname;
-  cs >> samuraiDBname >> scoreDBname;
-  samuraiDB = SamuraiDB(samuraiDBname, scoreDBname);
-  cs >> gameName >> turns >> timeAllowed
-     >> width >> height >> cureTurns;
-  int armySizes[2];
-  cs >> armySizes[0] >> armySizes[1];
-  for (int a = 0; a != 2; a++) {
-    for (int s = 0; s != armySizes[a]; s++) {
-      roles[a].emplace_back(3*a+s,cs);
-    }
-  }
-}
-
-void Setting::sendSettingInfo(ostream& os, const int weapon) {
-  os << "# <number of turns>\n" << turns << endl;
-  os << "# <samurai ID>\n" << weapon << endl;
-  os << "# <field width> <field height>\n" << width << ' ' << height << endl;
-  os << "# Home positions of samrai\n";
-  for (int a = 0; a != 2; a++) {
-    for (Role& role: roles[a]) {
-      os << role.homeX << ' ' << role.homeY << endl;
-    }
+Setting::Setting() {
+  for (int id = 0; id != 6; id++) {
+    roles[id].init(id);
   }
 }
 
 void SamuraiState::init
-(Setting& setting, BattleField& field, int id, int sd, int wp) {
-  samurai = &setting.samuraiDB.samuraiList[id];
-  side = sd;
-  weapon = wp;
-  role = &setting.roles[side][weapon];
+(Setting& setting, BattleField& field, int id) {
+  side = id/3;
+  weapon = id%3;
+  role = &setting.roles[id];
   position = field.section(role->homeX, role->homeY);
   position->arrive(this);
   curePeriod = 0;
   hidden = false;
-  char cdirname[] = "/tmp/SamurAIXXXXXX";
-  if (mkdtemp(cdirname) == 0)
-    throw ErrorReport("Filed to make a temporary directory: "+errno);
-  dirname = cdirname;
-  toAIpath = dirname + "/toAI";
-  mkfifo(toAIpath.c_str(), 0600);
-  fromAIpath = dirname + "/fromAI";
-  mkfifo(fromAIpath.c_str(), 0600);
+  int pipeToAI[2];
+  if (pipe(pipeToAI) < 0) {
+    throw ErrorReport("Failed to create a pipe: "+errno);
+  }
+  int pipeFromAI[2];
+  if (pipe(pipeFromAI) < 0) {
+    throw ErrorReport("Failed to create a pipe: "+errno);
+  }
   processId = fork();
   if (processId == -1) {
     throw ErrorReport("Failed to fork an AI process: "+errno);
-  } else if (processId == 0) {
+  }
+  if (processId == 0) {
     // Child process
-    string command(setting.samuraiDB.programDir);
-    if (command.back() != '/') command += '/';
-    command += samurai->invocation;
-    for (size_t pos = command.find("$1");
-	pos != string::npos;
-	pos = command.find("$1")) {
-      command.replace(pos, 2, samurai->progname);
+    // stdin from the pipe
+    close(pipeToAI[1]);
+    dup2(pipeToAI[0], 0);
+    close(pipeToAI[0]);
+    // stdout to the pipe
+    close(pipeFromAI[0]);
+    dup2(pipeFromAI[1], 1);
+    close(pipeFromAI[1]);
+    if (system(invokeCommand.c_str()) < 0) {
+      throw ErrorReport("Failed to execute "+invokeCommand+": "
+			+to_string(errno));
     }
-    system((command + " <" + toAIpath + " >" + fromAIpath).c_str());
     exit(0);
   } else {
-    toAI = new ofstream(toAIpath);
-    ifstream* fromAIstream = new ifstream(fromAIpath);
-    fromAI = CommentedIStream(*fromAIstream);
+    close(pipeToAI[0]);
+    close(pipeFromAI[1]);
+    FILE* fai = fdopen(pipeFromAI[0], "r");
+    if (fai == nullptr) {
+      throw ErrorReport("Failed to open pipe to AI: "+errno);
+    }
+    fromAI = SamuraiScanner(fai);
+    toAI = fdopen(pipeToAI[1], "w");
+    if (toAI == nullptr) {
+      throw ErrorReport("Failed to open pipe from AI: "+errno);
+    }
   }
 }
 
-bool SamuraiState::move(GameState& state, int direction, ostream& comments) {
+bool SamuraiState::move(GameState& state, int direction, string& comments) {
   Section* p = position->neighbors[direction];
   if (p == 0) {
-    comments << "Invalid move direction: " << direction
-	     << " from " << position->coords.toString();
+    comments += "Invalid move direction: " + to_string(direction)
+      + " from " + position->coords.toString();
     return false;
   }
-  for (int a = 0; a != 2; a++) {
-    for (int w = 0; w != 3; w++) {
-      SamuraiState& ss = state.samuraiStates[a][w];
-      if (&ss != this &&
-	  ss.role->homeX == p->coords.x &&
-	  ss.role->homeY == p->coords.y) {
-	comments << "Moving to home of another samurai: "
-		 << position->coords.toString();
-	return false;
-      }
-    }
-  }
-  if (hidden)
-    if (p->state < 0 || p->state/3 != role->id/3) {
-      comments << "Hidden move to non-territory from: "
-	       << position->coords.toString()
-	       << " to " << p->coords.toString();
+  for (int s = 0; s != 6; s++) {
+    SamuraiState& ss = samuraiStates[s];
+    if (&ss != this &&
+	ss.role->homeX == p->coords.x &&
+	ss.role->homeY == p->coords.y) {
+      comments += "Moving to home of another samurai: "
+	+ position->coords.toString();
       return false;
     }
+  }
+  if (hidden) {
+    if (p->state < 0 || p->state/3 != role->id/3) {
+      comments += "Hidden move to non-territory from: "
+	+ position->coords.toString()
+	+ " to " + p->coords.toString();
+      return false;
+    }
+  } else {
+    if (p->apparent != 0) {
+      comments += "Moving to an already filled section: "
+	+ position->coords.toString()
+	+ " to " + p->coords.toString();
+      return false;
+    }
+  }
   if (dump) {
-    *ds << "Samurai " << side << "." << weapon
-	<< " moves from " << position->coords.toString()
-	<< " to " << p->coords.toString() << endl;
+    fprintf(dump, "Samurai %d.%d moves from %s to %s\n",
+	    side, weapon, position->coords.toString().c_str(),
+	    p->coords.toString().c_str());
   }
   position->leave(this);
   position = p;
   position->arrive(this);
   return true;
 }
-bool SamuraiState::occupy(GameState& state, int direction, ostream& comments) {
+
+bool SamuraiState::occupy(GameState& state, int direction, string& comments) {
   if (hidden) {
-    comments << "Hidden samurai tried occupation";
+    comments += "Hidden samurai tried occupation";
     return false;
   }
   state.battleField.occupy(state, *role, direction, *position);
   return true;
 }
-bool SamuraiState::hide(ostream& comments) {
+bool SamuraiState::hide(string& comments) {
   if (hidden) {
-    comments << "Hidden samurai tries to hide itself further";
+    comments += "Hidden samurai tries to hide itself further";
     return false;
   }
   assert(position->apparent == this);
   if (position->state < 0 || position->state/3 != role->id/3) {
-    comments <<"Trying to hide itself at non-territory: ";
+    comments += "Trying to hide itself at non-territory: ";
     return false;
   }
   hidden = true;
   position->apparent = 0;
   return true;
 }
-bool SamuraiState::appear(ostream& comments) {
+bool SamuraiState::appear(string& comments) {
   if (!hidden) {
-    comments << "Non-hidden samurai tries to appear";
+    comments += "Non-hidden samurai tries to appear";
     return false;
   }
   if (position->apparent != 0) return false;
@@ -161,111 +158,104 @@ void SamuraiState::house(BattleField& field) {
 }
 void SamuraiState::die(BattleField& field) {
   if (dump) {
-    *ds << "Samurai " << side << "." << weapon << " disqualified" << endl;
+    fprintf(dump, "Samurai %d.%d disqualified\n", side, weapon);
   }
   house(field);
   alive = false;
 }
 void SamuraiState::injure(BattleField& field, Setting& setting) {
   if (dump) {
-    *ds << "Samurai " << side << "." << weapon << " injured" << endl;
+    fprintf(dump, "Samurai %d.%d injured\n", side, weapon);
   }
   house(field);
   curePeriod = setting.cureTurns;
 }
 
-
 void readResponse(SamuraiState& ss) {
-  ss.fromAI >> ss.response;
+  ss.response = ss.fromAI.get();
   ss.done = true;
 }
 
-GameState::GameState(Setting& stng, int players[]):
-  setting(stng),
-  battleField(BattleField(setting.width, setting.height)) {
-  for (int side = 0; side != 2; side++) {
-    vector<Role>& roles = setting.roles[side];
-    unsigned int armySize = roles.size();
-    samuraiStates[side] = new SamuraiState[armySize];
-    for (unsigned int s = 0; s != armySize; s++) {
-      SamuraiState& ss = samuraiStates[side][s];
-      ss.init(setting, battleField, players[side*armySize+s], side, s);
-    }
+void GameState::init() {
+  for (int s = 0; s != 6; s++) {
+    samuraiStates[s].init(setting, battleField, s);
   }
-  for (int side = 0; side != 2; side++) {
-    vector<Role>& roles = setting.roles[side];
-    unsigned int armySize = roles.size();
-    for (unsigned int s = 0; s != armySize; s++) {
-      SamuraiState& ss = samuraiStates[side][s];
-      sendGameInfo(*ss.toAI, side, s);
-      if (logif) {
-	sendGameInfo(ifs[3*side+s], side, s);
+  for (int s = 0; s != 6; s++) {
+    SamuraiState& ss = samuraiStates[s];
+    sendGameInfo(ss.toAI, s);
+    if (ifs != nullptr) sendGameInfo(ifs[s], s);
+    ss.response = -1;
+    ss.done = false;
+    thread* readerThread = new thread(readResponse, ref(ss));
+    chrono::system_clock::time_point till =
+      chrono::system_clock::now() +
+      chrono::milliseconds(setting.initTimeAllowed);
+    while (!ss.done) {
+      this_thread::sleep_for(chrono::milliseconds(10));
+      chrono::system_clock::time_point now = 
+	chrono::system_clock::now();
+      if (now >= till) break;
+    }
+    if (system(ss.pauseCommand.c_str()) < 0) {
+      throw ErrorReport("Failed to execute "+ss.pauseCommand+": "
+			+to_string(errno));
+    }
+    ss.alive = ss.done;
+    readerThread->join();
+    if (!ss.alive) {
+      fprintf(stderr, "Time out at initiatin: samurai %d.%d\n", s/3, s%3);
+    } else {
+      if (ss.response != 0) {
+	fprintf(stderr, "Wrong response %d at initiation of samurai %d.%d\n",
+		ss.response, s/3, s%3);
+	ss.alive = false;
       }
-      ss.response = -1;
-      ss.done = false;
-      thread* readerThread = new thread(readResponse, ref(ss));
-      chrono::system_clock::time_point till =
-	chrono::system_clock::now() +
-	chrono::milliseconds(setting.timeAllowed);
-      while (!ss.done) {
-	this_thread::sleep_for(chrono::milliseconds(1));
-	chrono::system_clock::time_point now = 
-	  chrono::system_clock::now();
-	if (now >= till) break;
-      }
-      ss.alive = ss.done;
-      if (!ss.alive) {
-	cerr << "Time out at initiation" << endl;
-	readerThread->detach();
-	kill(ss.processId, SIGKILL);
-      } else {
-	readerThread->join();
-	delete readerThread;
-	if (ss.response != 0) {
-	  cerr << "Wrong response at initiation" << endl;
-	  ss.alive = false;
-	}
-      }
+    }
+    delete readerThread;
+    if (!ss.alive) {
+      kill(ss.processId, SIGKILL);
     }
   }
   turn = 0;
 }
 
-void GameState::sendGameInfo(ostream& os, const int side, const int weapon) {
-  os << "# <# turns> <side> <weapon> <width> <height> <cure period>\n"
-     << setting.turns << ' ' << side << ' ' << weapon << ' '
-     << battleField.width << ' ' << battleField.height << ' '
-     << setting.cureTurns << endl;
-  os << "# Home positions\n";
-  for (int a = 0; a != 2; a++) {
+void GameState::sendGameInfo(FILE* out, int id) {
+  fprintf(out,
+	  "# <# turns> <side> <weapon> <width> <height> <cure period>\n"
+	  "%d %d %d %d %d %d\n",
+	  setting.turns, id/3, id%3,
+	  battleField.width, battleField.height,
+	  setting.cureTurns);
+  fprintf(out, "# Home positions\n");
+  for (int a = id/3; a != id/3+2; a++) {
     for (int w = 0; w != 3; w++) {
-      os << setting.roles[(a+side)%2][w].homeX << ' '
-	 << setting.roles[(a+side)%2][w].homeY << endl;
+      int s = (3*a+w)%6;
+      fprintf(out, "%d %d\n", setting.roles[s].homeX, setting.roles[s].homeY);
     }
   }
-  os << "# Ranks and scores of samurai\n";
-  for (int a = 0; a != 2; a++) {
-    for (int w = 0; w != 3; w++) {
-      SamuraiState& ss = samuraiStates[(a+side)%2][w];
-      os << ss.samurai->rank << ' ' << ss.samurai->score << endl;
-    }
+  fprintf(out, "# Ranks and scores of samurai\n");
+  for (int s = 0; s != 6; s++) {
+    SamuraiState& ss = samuraiStates[s];
+    fprintf(out, "%d %d\n", ss.rank, ss.score);
   }
-  os.flush();
+  fflush(out);
 }
 
-void GameState::sendTurnInfo(ostream& os, const int side, const int weapon) {
-  SamuraiState ss = samuraiStates[side][weapon];
+void GameState::sendTurnInfo(FILE* out, int side, int weapon) {
+  SamuraiState ss = samuraiStates[3*side+weapon];
   if (ss.alive) {
-    os << "# Turn information for samurai of side " << side
-       << " with weapon " << weapon << endl;
-    os << "# <turn>\n" << turn << endl;
-    os << "# <cure period>\n" << ss.curePeriod << endl;
+    fprintf(out, 
+	    "# Turn information for samurai of side %d with weapon %d\n",
+	    side, weapon);
+    fprintf(out, "# <turn>\n%d\n", turn);
+    fprintf(out, "# <cure period>\n%d\n", ss.curePeriod);
     const int width = battleField.width;
     const int height = battleField.height;
     bool visible[width*height] = {};
-    for (int weapon = 0; weapon != 3; weapon++) {
-      const int v = setting.roles[side][weapon].vision;
-      const Section& s = *samuraiStates[side][weapon].position;
+    for (int w = 0; w != 3; w++) {
+      int who = 3*side+w;
+      const int v = setting.roles[who].vision;
+      const Section& s = *samuraiStates[who].position;
       int x0 = s.coords.x;
       int y0 = s.coords.y;
       for (int dy = -v; dy <= v; dy++) {
@@ -281,20 +271,22 @@ void GameState::sendTurnInfo(ostream& os, const int side, const int weapon) {
 	}
       }
     }
-    os << "# Samurai states: <position x> <position y> <hiding>\n";
+    fprintf(out, "# Samurai states: <position x> <position y> <hiding>\n");
     for (int a = 0; a != 2; a++) {
       for (int w = 0; w != 3; w++) {
-	SamuraiState& ss = samuraiStates[(a+side)%2][w];
+	int s = 3*((a+side)%2)+w;
+	SamuraiState& ss = samuraiStates[s];
 	int x = ss.position->coords.x;
 	int y = ss.position->coords.y;
 	if (a == 0 || (visible[y*width+x] && !ss.hidden)) {
-	  os << x << ' ' << y << ' ' << (ss.alive ?  (ss.hidden ? 1 : 0)  : -1) << endl;
+	  fprintf(out, "%d %d %d\n",
+		  x, y, (ss.alive ?  (ss.hidden ? 1 : 0)  : -1));
 	} else {
-	  os << -1 << ' ' << -1 << ' ' <<  (ss.alive ? 1 : -1) << endl;
+	  fprintf(out, "-1 -1 %d\n", (ss.alive ? 1 : -1));
 	}
       }
     }
-    os << "# Battle field states\n";
+    fprintf(out, "# Battle field states\n");
     for (int y = 0; y != height; y++) {
       for (int x = 0; x != width; x++) {
 	if (visible[y*width+x]) {
@@ -304,14 +296,14 @@ void GameState::sendTurnInfo(ostream& os, const int side, const int weapon) {
 	     (side == 0 ? sect->state :
 	      (sect->state >= 3 ? sect->state -3 :
 	       sect->state + 3)));
-	  os << ' ' << sectState;
+	  fprintf(out, " %d", sectState);
 	} else {
-	  os << ' ' << 9;
+	  fprintf(out, " 9");
 	}
       }
-      os << '\n';
+      fprintf(out, "\n");
     }
-    os.flush();
+    fflush(out);
   }
 }
 
@@ -319,30 +311,33 @@ void readActions(SamuraiState& ss) {
   while (!ss.actions.empty()) {
     ss.actions.pop();
   }
-  while (true) {
-    int action;
-    ss.fromAI >> action;
-    if (!ss.fromAI.good()) {
-      ss.alive = false;
-      break;
-    }
+  while (ss.alive) {
+    int action = ss.fromAI.get();
     if (action == 0) break;
     ss.actions.push(action);
-    if (dump) *ds << ' ' << action;
+    if (dump) fprintf(dump, " %d", action);
   }
-  if (dump) { *ds << endl; ds->flush(); }
+  if (dump) {
+    fprintf(dump, "\n");
+    fflush(dump);
+  }
   ss.done = true;
 }
 
 void GameState::receiveActionCommands
-(CommentedIStream& is, const int side, const int weapon, ostream& log) {
-  log << "# Turn " << turn << '/' << setting.turns << endl;
-  log << "# <samurai id>\n" << side*3+weapon << endl;
-  log << "# <think time> <used time>\n"
-      << setting.timeAllowed << ' ' << 0 << endl;
-  ostringstream turnComments;
-  SamuraiState& ss = samuraiStates[side][weapon];
+(SamuraiScanner& is, const int side, const int weapon, FILE* log) {
+  int id = 3*side+weapon;
+  fprintf(log, "# Turn %d/%d\n", turn, setting.turns);
+  fprintf(log, "# <samurai id>\n%d\n", id);
+  fprintf(log, "# <think time> <used time>\n%d %d\n",
+	  setting.timeAllowed, 0);
+  string turnComments;
+  SamuraiState& ss = samuraiStates[id];
   if (ss.alive) {
+    if (system(ss.resumeCommand.c_str()) < 0) {
+      throw ErrorReport("Failed to execute "+ss.resumeCommand+": "
+			+to_string(errno));
+    }
     ss.done = false;
     thread* readerThread = new thread(readActions, ref(ss));
     chrono::system_clock::time_point till =
@@ -354,37 +349,41 @@ void GameState::receiveActionCommands
 	chrono::system_clock::now();
       if (now >= till) break;
     }
+    if (system(ss.pauseCommand.c_str()) < 0) {
+      throw ErrorReport("Failed to execute "+ss.pauseCommand+": "
+			+to_string(errno));
+    }
     if (!ss.done) {
-      cerr << "Timed out @ turn " << turn << endl;
-      turnComments << "Timed out";
+      fprintf(stderr, "Timed out @ turn %d\n", turn);
+      turnComments += "Timed out";
       readerThread->detach();
       kill(ss.processId, SIGKILL);
       goto DEAD;
     }
     readerThread->join();
     delete readerThread;
-    log << "# Actions\n";
+    fprintf(log, "# Actions\n");
     {
       int power = ss.role->activity;
       if (!ss.actions.empty() && ss.curePeriod != 0) {
-	turnComments << "Trying to act under recovery";
+	turnComments += "Trying to act under recovery";
 	goto FINISH;
       }
       while (!ss.actions.empty()) {
 	int action = ss.actions.front();
 	if (action < 0 || action > 10) {
-	  turnComments << "Invalid action specified: " << action;
+	  turnComments += "Invalid action specified: " + action;
 	  goto FINISH;
 	} else {
 	  static int required[] = {0, 4, 4, 4, 4, 2, 2, 2, 2, 1, 1}; 
 	  power -= required[action];
 	  if (power < 0) {
-	    turnComments << "Action limit exceeded";
+	    turnComments += "Action limit exceeded";
 	    goto FINISH;
 	  }
 	  if (dump) {
-	    *ds << "Samurai " << ss.side << "." << ss.weapon
-		<< " performs action: " << action << endl;
+	    fprintf(dump, "Samurai %d.%d performs action: %d\n",
+		    ss.side, ss.weapon, action);
 	  }
 	  ss.actions.pop();
 	  if (action <= 4) {
@@ -396,51 +395,19 @@ void GameState::receiveActionCommands
 	  } else if (action == 10) {
 	    if (!ss.appear(turnComments)) goto FINISH;
 	  }
-	  log << action << ' ';
+	  fprintf(log, "%d ", action);
 	}
       }
     }
   FINISH:
-    log << '0' << endl
-	<< "# Comments" << endl
-	<< "\"" << turnComments.str() << "\"" << endl;
+    fprintf(log, "0\n# Comments\n\"%s\"\n", turnComments.c_str());
+    fflush(log);
     return;
   } else {
-    turnComments << "Disqualified";
+    turnComments += "Disqualified";
   }
  DEAD:
   ss.die(battleField);
-  log << "-1" << endl
-      << "# Comments" << endl
-      << "\"" << turnComments.str() << "\"" << endl;
+  fprintf(log, "-1\n# Comments\n\"%s\"\n", turnComments.c_str());
   return;
-}
-
-ostream& operator<<(ostream& os, const Setting& setting) {
-  cout << "Game Name: " << setting.gameName << endl
-       << "Turns: " << setting.turns << endl
-       << "Time Allowed: " << setting.timeAllowed << endl
-       << "Field Size: " << setting.width << " x " << setting.height << endl
-       << "Samurai Set:" << endl
-       << setting.samuraiDB;
-  for (int a = 0; a != 2; a++) {
-    cout << "Army " << a << endl;
-    for (auto&& role: setting.roles[a]) {
-      cout << role;
-    }
-  }
-  return os;
-}
-
-ostream& operator<<(ostream& os, const Role& role) {
-  os << "Reach:";
-  for (auto&& c: role.reach) {
-    os << " " << c.toString();
-  }
-  os << endl;
-  os << "Vision: " << role.vision << "; "
-     << "Activity: " << role.activity << "; "
-     << "Home: " << Coordinates(role.homeX, role.homeY).toString() << ";"
-     << endl;
-  return os;
 }
