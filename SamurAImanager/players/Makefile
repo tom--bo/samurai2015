@@ -34,13 +34,13 @@ abortingPlayer: ${ABORTINGOBJECTS}
 greedyPlayer: ${GREEDYOBJECTS}
 	${CPP} ${CPPFLAGS} -o $@ $^
 
-greedyPlayer0: ${GREEDYOBJECTS}
+greedyPlayer0: ${GREEDYOBJECTS0}
 	${CPP} ${CPPFLAGS} -o $@ $^
 
-greedyPlayer1: ${GREEDYOBJECTS}
+greedyPlayer1: ${GREEDYOBJECTS1}
 	${CPP} ${CPPFLAGS} -o $@ $^
 
-greedyPlayer2: ${GREEDYOBJECTS}
+greedyPlayer2: ${GREEDYOBJECTS2}
 	${CPP} ${CPPFLAGS} -o $@ $^
 
 -include ${OBJECTS:.o=.d}
