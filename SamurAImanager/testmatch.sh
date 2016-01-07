@@ -7,3 +7,5 @@ manager/gameManager \
     -a players/greedyPlayer -p "" -u "" -n "random5" -r 5 -s 60 \
     -a players/greedyPlayer  -p "" -u "" -n "random6" -r 6 -s 20 \
     -t
+
+rm SamuraiLog*
