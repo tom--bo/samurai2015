@@ -68,7 +68,7 @@ struct GameInfo {
     bool isValid(int action) const;
     bool isValidAt(int action, int x, int y, int hidden) const;
     void occupy(int direction);
-    void tryAction(int action, Undo& undo, int& territory, int& selfTerritory, int& injury, int& hiding);
+    void tryAction(int action, Undo& undo, int& territory, int& selfTerritory, int& injury, int& hiding,int& avoiding);
     void doAction(int action);
 };
 

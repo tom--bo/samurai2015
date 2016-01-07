@@ -6,6 +6,7 @@ extern double territoryMerits;
 extern double selfTerritoryMerits;
 extern double hurtingMerits;
 extern double hidingMerits;
+extern double avoidingMerits;
 
 list<int> bestPlay;
 list<int> currentPlay;
@@ -22,12 +23,13 @@ struct PlanningPlayer: Player {
             if (required[action] <= power && info.isValidAt(action, me.curX, me.curY, me.hidden)) {
                 currentPlay.push_back(action);
                 Undo undo;
-                int territory, selfTerritory, injury, hiding;
-                info.tryAction(action, undo, territory, selfTerritory, injury, hiding);
+                int territory, selfTerritory, injury, hiding, avoiding;
+                info.tryAction(action, undo, territory, selfTerritory, injury, hiding, avoiding);
                 double gain = territoryMerits*territory
                     + selfTerritoryMerits*selfTerritory
                     + hurtingMerits*injury
-                    + hidingMerits*hiding;
+                    + hidingMerits*hiding
+                    + avoidingMerits*avoiding;
                 plan(info, me, power-required[action], merits+gain);
                 undo.apply();
                 currentPlay.pop_back();
