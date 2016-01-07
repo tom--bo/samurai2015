@@ -216,9 +216,9 @@ void Undo::apply() {
     for (SamuraiUndo& u: samuraiUndo) u.apply();
 }
 
-void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerritory, int& injury, int& hiding) {
+void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerritory, int& injury, int& hiding, int& avoiding) {
     SamuraiInfo& me = samuraiInfo[weapon];
-    territory = selfTerritory = injury = hiding = 0;
+    territory = selfTerritory = injury = hiding = avoiding = 0;
     switch (action) {
         case 1: case 2: case 3: case 4: { // occupation
             static const int size[3] = {4, 5, 7};
@@ -278,6 +278,19 @@ void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerri
             undo.recSamurai(&me);
             me.curX += dx[action-5];
             me.curY += dy[action-5];
+            //check enemy attack area for avoiding
+            for (int s = 3; s != 6; s++) {
+                SamuraiInfo& si = samuraiInfo[s];
+                int safeDistance=3;
+                if(s==3){
+                    safeDistance=5;   
+                }
+                if(abs(me.curX-si.curX)+abs(me.curY-si.curY)<=safeDistance){
+                    avoiding+=1;
+                }
+            }
+
+
             break;
         }
         case 9:            // hide
@@ -295,8 +308,8 @@ void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerri
 
 void GameInfo::doAction(int action) {
     Undo dummy;
-    int dummy1, dummy2, dummy3, dummy4;
-    tryAction(action, dummy, dummy1, dummy2, dummy3, dummy4);
+    int dummy1, dummy2, dummy3, dummy4, dummy5;
+    tryAction(action, dummy, dummy1, dummy2, dummy3, dummy4, dummy5);
     cout << action << ' ';
 }
 
