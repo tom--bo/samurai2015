@@ -216,9 +216,9 @@ void Undo::apply() {
     for (SamuraiUndo& u: samuraiUndo) u.apply();
 }
 
-void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerritory, int& injury, int& hiding, int& avoiding) {
+void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerritory, int& injury, int& hiding, int& avoiding, int& moving) {
     SamuraiInfo& me = samuraiInfo[weapon];
-    territory = selfTerritory = injury = hiding = avoiding = 0;
+    territory = selfTerritory = injury = hiding = avoiding = moving = 0;
     switch (action) {
         case 1: case 2: case 3: case 4: { // occupation
             static const int size[3] = {4, 5, 7};
@@ -275,7 +275,10 @@ void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerri
         case 5: case 6: case 7: case 8: {
             static const int dx[] = { 0, 1, 0, -1 };
             static const int dy[] = { 1, 0, -1, 0 };
+            int distance=0, beforeDistance=0, afterDistance=0;
             undo.recSamurai(&me);
+            int oldX = me.curX;
+            int oldY = me.curY;
             me.curX += dx[action-5];
             me.curY += dy[action-5];
             //check enemy attack area for avoiding
@@ -289,8 +292,14 @@ void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerri
                     avoiding+=1;
                 }
             }
+            for (int s = 0; s != 3; s++) {
+                SamuraiInfo& si = samuraiInfo[s];
 
-
+                beforeDistance = abs(oldX-si.homeX) + abs(oldY-si.homeY); 
+                afterDistance = abs(me.curX-si.homeX) + abs(me.curY-si.homeY);
+                distance = afterDistance - beforeDistance;
+                moving += distance;
+            }
             break;
         }
         case 9:            // hide
@@ -308,8 +317,8 @@ void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerri
 
 void GameInfo::doAction(int action) {
     Undo dummy;
-    int dummy1, dummy2, dummy3, dummy4, dummy5;
-    tryAction(action, dummy, dummy1, dummy2, dummy3, dummy4, dummy5);
+    int dummy1, dummy2, dummy3, dummy4, dummy5, dummy6;
+    tryAction(action, dummy, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6);
     cout << action << ' ';
 }
 
