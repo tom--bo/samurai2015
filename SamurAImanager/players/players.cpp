@@ -5,8 +5,8 @@
 bool logging = false;
 
 CommentedIStream::CommentedIStream(istream &is):
-    is(&is) {
-    }
+is(&is) {
+}
 
 int CommentedIStream::get() {
     if (is->eof()) exit(0);
@@ -216,7 +216,7 @@ void Undo::apply() {
     for (SamuraiUndo& u: samuraiUndo) u.apply();
 }
 
-void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerritory, int& injury, int& hiding, int& avoiding, int& moving) {
+void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerritory, int& injury, int& hiding, int& avoiding, int& moving, int myTern, int enemyMemory[100]) {
     SamuraiInfo& me = samuraiInfo[weapon];
     territory = selfTerritory = injury = hiding = avoiding = moving = 0;
     switch (action) {
@@ -305,11 +305,23 @@ void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerri
         case 9:            // hide
             undo.recSamurai(&me);
             me.hidden = 1;
+            if(enemyMemory[myTern] >= 1) {
+                hiding += 2;
+            }
+            if(enemyMemory[myTern-1] >= 1) {
+                hiding += 1;
+            }
             hiding += 1;
             break;
         case 10:            // appear
             undo.recSamurai(&me);
             me.hidden = 0;
+            if(enemyMemory[myTern] >= 1) {
+                hiding -= 2;
+            }
+            if(enemyMemory[myTern-1] >= 1) {
+                hiding -= 1;
+            }
             hiding -= 1;
             break;
     }
@@ -317,8 +329,9 @@ void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerri
 
 void GameInfo::doAction(int action) {
     Undo dummy;
-    int dummy1, dummy2, dummy3, dummy4, dummy5, dummy6;
-    tryAction(action, dummy, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6);
+    int dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7;
+    int dummy8[100] = {};
+    tryAction(action, dummy, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8);
     cout << action << ' ';
 }
 

@@ -12,9 +12,11 @@ extern double movingMerits;
 list<int> bestPlay;
 list<int> currentPlay;
 double bestMerits;
+int enemyMemory[100] = {};
+int myTern = 0;
 
 struct PlanningPlayer: Player {
-    void plan(GameInfo& info, SamuraiInfo& me, int power, double merits) {
+    void plan(GameInfo& info, SamuraiInfo& me, int power, double merits, int myTern, int enemyMemory[100]) {
         if (merits > bestMerits) {
             bestMerits = merits;
             bestPlay = currentPlay;
@@ -25,14 +27,14 @@ struct PlanningPlayer: Player {
                 currentPlay.push_back(action);
                 Undo undo;
                 int territory, selfTerritory, injury, hiding, avoiding, moving;
-                info.tryAction(action, undo, territory, selfTerritory, injury, hiding, avoiding, moving);
+                info.tryAction(action, undo, territory, selfTerritory, injury, hiding, avoiding, moving, myTern, enemyMemory);
                 double gain = territoryMerits*territory
                     + selfTerritoryMerits*selfTerritory
                     + hurtingMerits*injury
                     + hidingMerits*hiding
                     + avoidingMerits*avoiding
                     + movingMerits*moving;
-                plan(info, me, power-required[action], merits+gain);
+                plan(info, me, power-required[action], merits+gain, myTern, enemyMemory);
                 undo.apply();
                 currentPlay.pop_back();
             }
@@ -41,7 +43,15 @@ struct PlanningPlayer: Player {
     void play(GameInfo& info) {
         currentPlay.clear();
         bestMerits = -1;
-        plan(info, info.samuraiInfo[info.weapon], 7, 0);
+        myTern += 1;
+        SamuraiInfo& me = info.samuraiInfo[info.weapon];
+        for (int s = 3; s != 6; s++) {
+            SamuraiInfo& si = info.samuraiInfo[s];
+            if((si.curX != -1 && si.curY != -1) && abs(me.curX-si.curX)+abs(me.curY-si.curY)<=5){
+                enemyMemory[myTern] += 1;
+            }
+        }
+        plan(info, info.samuraiInfo[info.weapon], 7, 0, myTern, enemyMemory);
         for (int action: bestPlay) {
             cout << action << ' ';
         }
