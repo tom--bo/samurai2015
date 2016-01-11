@@ -216,7 +216,7 @@ void Undo::apply() {
     for (SamuraiUndo& u: samuraiUndo) u.apply();
 }
 
-void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerritory, int& injury, int& hiding, int& avoiding, int& moving, int myTern, int enemyMemory[100]) {
+void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerritory, int& injury, int& hiding, int& avoiding, int& moving, int myTern, int enemyMemory[100], int myfield[2]) {
     SamuraiInfo& me = samuraiInfo[weapon];
     territory = selfTerritory = injury = hiding = avoiding = moving = 0;
     switch (action) {
@@ -281,14 +281,11 @@ void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerri
             int oldY = me.curY;
             me.curX += dx[action-5];
             me.curY += dy[action-5];
-            for (int s = 0; s != 3; s++) {
-                SamuraiInfo& si = samuraiInfo[s];
 
-                beforeDistance = abs(oldX-si.homeX) + abs(oldY-si.homeY); 
-                afterDistance = abs(me.curX-si.homeX) + abs(me.curY-si.homeY);
-                distance = afterDistance - beforeDistance;
-                moving += distance;
-            }
+            beforeDistance = abs(oldX-myfield[0]) + abs(oldY-myfield[1]); 
+            afterDistance = abs(me.curX-myfield[0]) + abs(me.curY-myfield[1]);
+            distance = afterDistance - beforeDistance;
+            moving += distance;
             break;
         }
         case 9:            // hide
@@ -350,7 +347,8 @@ void GameInfo::doAction(int action) {
     Undo dummy;
     int dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7;
     int dummy8[100] = {};
-    tryAction(action, dummy, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8);
+    int dummy9[2] = {};
+    tryAction(action, dummy, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8, dummy9);
     cout << action << ' ';
 }
 
