@@ -48,6 +48,7 @@ struct PlanningPlayer: Player {
     void play(GameInfo& info) {
         currentPlay.clear();
         updateMyField(info);
+        setMerits(info);
         bestMerits = -1;
         myTern += 1;
         SamuraiInfo& me = info.samuraiInfo[info.weapon];
@@ -89,6 +90,35 @@ struct PlanningPlayer: Player {
                     myfield[1] = j*3+2;
                 }
             }
+        }
+    }
+    void setMerits(GameInfo& info){
+        switch(info.weapon){
+            case 0:
+                territoryMerits = 1;
+                selfTerritoryMerits = 0.1;
+                hurtingMerits = 100;
+                hidingMerits = 0.2;
+                avoidingMerits = -1;
+                movingMerits = 1;               
+                break;
+            case 1:
+                territoryMerits = 2;
+                selfTerritoryMerits = 0.1;
+                hurtingMerits = 100;
+                hidingMerits = 2;
+                avoidingMerits = -5;
+                movingMerits = 0.5;               
+                
+                break;
+            case 2:
+                territoryMerits = 1;
+                selfTerritoryMerits = 0.1;
+                hurtingMerits = 100;
+                hidingMerits = 1;
+                avoidingMerits = -4;
+                movingMerits = 0.1;               
+                break;
         }
     }
 };
