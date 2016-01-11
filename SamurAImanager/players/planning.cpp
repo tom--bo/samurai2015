@@ -20,6 +20,10 @@ struct PlanningPlayer: Player {
         if (merits > bestMerits) {
             bestMerits = merits;
             bestPlay = currentPlay;
+        } else if (merits == bestMerits) {
+            if((int)(merits*3) % 2 == 0) {
+                bestPlay = currentPlay;
+            }
         }
         static const int required[] = {0, 4, 4, 4, 4, 2, 2, 2, 2, 1, 1}; 
         for (int action = 1; action != 11; action++) {
