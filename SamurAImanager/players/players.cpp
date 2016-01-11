@@ -284,7 +284,7 @@ void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerri
 
             beforeDistance = abs(oldX-myfield[0]) + abs(oldY-myfield[1]); 
             afterDistance = abs(me.curX-myfield[0]) + abs(me.curY-myfield[1]);
-            distance = afterDistance - beforeDistance;
+            distance = beforeDistance - afterDistance;
             moving += distance;
             break;
         }
