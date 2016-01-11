@@ -317,7 +317,6 @@ void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerri
     for (int s = 3; s != 6; s++) {
         SamuraiInfo& si = samuraiInfo[s];
         if(si.curX==-1&&si.curY==-1)continue;
-        if(si.curX==si.homeX&&si.curY==si.homeY)continue;
         int diffx=abs(me.curX-si.curX);
         int diffy=abs(me.curY-si.curY);
         //axe

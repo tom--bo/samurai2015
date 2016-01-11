@@ -53,7 +53,7 @@ struct PlanningPlayer: Player {
         SamuraiInfo& me = info.samuraiInfo[info.weapon];
         for (int s = 3; s != 6; s++) {
             SamuraiInfo& si = info.samuraiInfo[s];
-            if((si.curX != -1 && si.curY != -1 && si.curX != si.homeX && si.curY != si.homeY) && abs(me.curX-si.curX)+abs(me.curY-si.curY)<=5){
+            if((si.curX != -1 && si.curY != -1 ) && abs(me.curX-si.curX)+abs(me.curY-si.curY)<=5){
                 enemyMemory[myTern] += 1;
             }
         }
