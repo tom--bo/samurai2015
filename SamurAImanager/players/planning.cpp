@@ -69,9 +69,9 @@ struct PlanningPlayer: Player {
         for(int i=0; i<225; i++){
             int y = i/15;
             int x = i%15;
-            if(info.field[i] >= 3) {
-                tmpField[x][y] = -1;
-            }else if(info.field[i] >= 0) {
+            if(info.field[i] < 3) {
+                tmpField[x][y] = 1;
+            }else if(info.field[i] < 6) {
                 tmpField[x][y] = 1;
             }
         }
