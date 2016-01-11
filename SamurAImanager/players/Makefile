@@ -12,7 +12,10 @@ GREEDYOBJECTS= ${COMMONOBJECTS} ${PLANNINGOBJECTS} greedyPlayer.o
 GREEDYOBJECTS0= ${COMMONOBJECTS} ${PLANNINGOBJECTS} greedyPlayer0.o
 GREEDYOBJECTS1= ${COMMONOBJECTS} ${PLANNINGOBJECTS} greedyPlayer1.o
 GREEDYOBJECTS2= ${COMMONOBJECTS} ${PLANNINGOBJECTS} greedyPlayer2.o
-TARGET= randomPlayer greedyPlayer0  greedyPlayer1  greedyPlayer2 greedyPlayer timeoutPlayer tooActivePlayer nonCheckingPlayer abortingPlayer
+GREEDYOBJECTS3= ${COMMONOBJECTS} ${PLANNINGOBJECTS} greedyPlayer3.o
+GREEDYOBJECTS4= ${COMMONOBJECTS} ${PLANNINGOBJECTS} greedyPlayer4.o
+GREEDYOBJECTS5= ${COMMONOBJECTS} ${PLANNINGOBJECTS} greedyPlayer5.o
+TARGET= randomPlayer greedyPlayer0  greedyPlayer1  greedyPlayer2 greedyPlayer3 greedyPlayer4 greedyPlayer5 greedyPlayer timeoutPlayer tooActivePlayer nonCheckingPlayer abortingPlayer
 
 all: ${TARGET}
 
@@ -41,6 +44,15 @@ greedyPlayer1: ${GREEDYOBJECTS1}
 	${CPP} ${CPPFLAGS} -o $@ $^
 
 greedyPlayer2: ${GREEDYOBJECTS2}
+	${CPP} ${CPPFLAGS} -o $@ $^
+
+greedyPlayer3: ${GREEDYOBJECTS3}
+	${CPP} ${CPPFLAGS} -o $@ $^
+
+greedyPlayer4: ${GREEDYOBJECTS4}
+	${CPP} ${CPPFLAGS} -o $@ $^
+
+greedyPlayer5: ${GREEDYOBJECTS5}
 	${CPP} ${CPPFLAGS} -o $@ $^
 
 -include ${OBJECTS:.o=.d}
