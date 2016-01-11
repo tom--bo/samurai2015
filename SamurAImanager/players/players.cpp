@@ -274,22 +274,10 @@ void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerri
         }
         case 5: case 6: case 7: case 8: {
             static const int dx[] = { 0, 1, 0, -1 };
-            static const int dy[] = { 1, 0, -1, 0 };
+            static const int dy[] = { 1, 0, -1, 0 }; 
             undo.recSamurai(&me);
             me.curX += dx[action-5];
             me.curY += dy[action-5];
-            //check enemy attack area for avoiding
-            for (int s = 3; s != 6; s++) {
-                SamuraiInfo& si = samuraiInfo[s];
-                int safeDistance=3;
-                if(s==3){
-                    safeDistance=5;   
-                }
-                if(abs(me.curX-si.curX)+abs(me.curY-si.curY)<=safeDistance){
-                    avoiding+=1;
-                }
-            }
-
 
             break;
         }
@@ -304,6 +292,35 @@ void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerri
             hiding -= 1;
             break;
     }
+    
+    //check enemy attack area for avoiding
+    bool isDanger=false;
+    for (int s = 3; s != 6; s++) {
+        SamuraiInfo& si = samuraiInfo[s];
+        if(si.curX==-1&&si.curY==-1)continue;
+        int diffx=abs(me.curX-si.curX);
+        int diffy=abs(me.curY-si.curY);
+        //axe
+        if(s==5 && (diffx<=2 || diffy<=2) && diffx+diffy!=4 ){
+            isDanger=true;
+        }
+        //sword
+        if(s==4 && diffx+diffy<=3){
+            isDanger=true;
+        }
+        //spear
+        if(s==3 && diffx+diffy<=5 ){
+            if(diffx==2&&diffy==2)continue;
+            if(diffx==2&&diffy==3)continue;
+            if(diffx==3&&diffy==2)continue;
+            isDanger=true;
+        }
+    }
+    if(isDanger){
+        avoiding++;
+    }
+
+
 }
 
 void GameInfo::doAction(int action) {
