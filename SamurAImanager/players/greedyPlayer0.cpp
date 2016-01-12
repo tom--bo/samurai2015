@@ -5,8 +5,8 @@ double hidingMerits;
 double avoidingMerits;
 double movingMerits;
 double doubleMerits;
-void setMerits(GameInfo& info){
-    switch(info.weapon){
+void setMerits(int weaponid){
+    switch(weaponid){
         case 0:
             territoryMerits = 2;
             selfTerritoryMerits = 0.1;
