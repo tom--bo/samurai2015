@@ -4,3 +4,4 @@ double hurtingMerits = 0.1;
 double hidingMerits = 0.1;
 double avoidingMerits = -10;
 double movingMerits = 1;
+double doubleMerits = 1;

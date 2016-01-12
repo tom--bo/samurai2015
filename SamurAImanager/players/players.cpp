@@ -216,9 +216,9 @@ void Undo::apply() {
     for (SamuraiUndo& u: samuraiUndo) u.apply();
 }
 
-void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerritory, int& injury, int& hiding, int& avoiding, int& moving, int myTern, int enemyMemory[100], int myfield[2]) {
+void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerritory, int& injury, int& hiding, int& avoiding, int& moving, int myTern, int enemyMemory[100], int myfield[2], int& doubleAction) {
     SamuraiInfo& me = samuraiInfo[weapon];
-    territory = selfTerritory = injury = hiding = avoiding = moving = 0;
+    territory = selfTerritory = injury = hiding = avoiding = moving = doubleAction = 0;
     switch (action) {
         case 1: case 2: case 3: case 4: { // occupation
             static const int size[3] = {4, 5, 7};
@@ -286,6 +286,36 @@ void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerri
             afterDistance = abs(me.curX-myfield[0]) + abs(me.curY-myfield[1]);
             distance = beforeDistance - afterDistance;
             moving += distance;
+
+            bool preInEnemyTerritory = false, nowInEnemyTerritory = false;
+            // doubleActionの時(剣と斧のみ）
+            if((weapon == 1 && turn%12 == 3) || (weapon == 2 && turn%12 == 11) || (weapon == 1 && turn%12 == 9) || (weapon == 2 && turn%12 == 5) || (weapon == 0 && turn%12 == 1) || (weapon == 0 && turn%12 == 7)){
+                //axe
+                if(weapon%3 == 1) {
+                    SamuraiInfo& si = samuraiInfo[4];
+                    if(si.curX!=-1&&si.curY!=-1){
+                        preInEnemyTerritory = isEnemyTerritory(oldX, oldY, 4, samuraiInfo[4]);
+                        nowInEnemyTerritory = isEnemyTerritory(me.curX, me.curY, 4, samuraiInfo[4]);
+                    }
+                } else if(weapon%3 == 2) { //sword
+                    SamuraiInfo& si = samuraiInfo[5];
+                    if(si.curX!=-1&&si.curY!=-1){
+                        preInEnemyTerritory = isEnemyTerritory(oldX, oldY, 5, samuraiInfo[5]);
+                        nowInEnemyTerritory = isEnemyTerritory(me.curX, me.curY, 5, samuraiInfo[5]);
+                    }
+                } else if(weapon%3 == 0) { // spir
+                    SamuraiInfo& si = samuraiInfo[3];
+                    if(si.curX!=-1&&si.curY!=-1){
+                        preInEnemyTerritory = isEnemyTerritory(oldX, oldY, 3, samuraiInfo[3]);
+                        nowInEnemyTerritory = isEnemyTerritory(me.curX, me.curY, 3, samuraiInfo[3]);
+                    }
+                }
+            }
+            if(preInEnemyTerritory == false && nowInEnemyTerritory == true) {
+                doubleAction += 1;
+            }else if(preInEnemyTerritory == true && nowInEnemyTerritory == false) {
+                doubleAction -= 1;
+            }
             break;
         }
         case 9:            // hide
@@ -313,6 +343,7 @@ void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerri
     }
     
     //check enemy attack area for avoiding
+    //bool 
     bool isDanger=false;
     for (int s = 3; s != 6; s++) {
         SamuraiInfo& si = samuraiInfo[s];
@@ -320,7 +351,7 @@ void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerri
         int diffx=abs(me.curX-si.curX);
         int diffy=abs(me.curY-si.curY);
         //axe
-        if(s==5 && (diffx<=2 || diffy<=2) && diffx+diffy!=4 ){
+        if(s==5 && (diffx<=2 && diffy<=2) && diffx+diffy!=4 ){
             isDanger=true;
         }
         //sword
@@ -341,13 +372,30 @@ void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerri
 
 
 }
+bool GameInfo::isEnemyTerritory(int meX, int meY, int enemyID, SamuraiInfo& si) {
+    int diffx=abs(meX-si.curX);
+    int diffy=abs(meY-si.curY);
+    if(enemyID==4 && diffx+diffy<=3){
+        return true;
+    }
+    if(enemyID==5 && (diffx<=2 && diffy<=2) && diffx+diffy!=4 ){
+        return true;
+    }
+    if(enemyID==3 && diffx+diffy<=5 ){
+        if(diffx==2&&diffy==2) return false;
+        if(diffx==2&&diffy==3) return false;
+        if(diffx==3&&diffy==2) return false;
+        return true;
+    }
+    return false;
+}
 
 void GameInfo::doAction(int action) {
     Undo dummy;
-    int dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7;
+    int dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy10;
     int dummy8[100] = {};
     int dummy9[2] = {};
-    tryAction(action, dummy, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8, dummy9);
+    tryAction(action, dummy, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8, dummy9, dummy10);
     cout << action << ' ';
 }
 
