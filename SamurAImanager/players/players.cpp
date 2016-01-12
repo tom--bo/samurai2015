@@ -249,7 +249,7 @@ void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerri
                         int current = field[pos];
                         if (current != weapon) {
                             selfTerritory += 1;
-                            if (current < 0) {    // unoccupied
+                            if (current >= 8) { // unoccupied
                                 territory += 1;
                             } else if (current >= 3) { // opponents' territory
                                 territory += 2;
@@ -293,19 +293,19 @@ void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerri
                 //axe
                 if(weapon%3 == 1) {
                     SamuraiInfo& si = samuraiInfo[4];
-                    if(si.curX!=-1&&si.curY!=-1){
+                    if(si.curX!=-1 && si.curY!=-1 && si.curX != si.homeX && si.curY != si.homeY){
                         preInEnemyTerritory = isEnemyTerritory(oldX, oldY, 4, samuraiInfo[4]);
                         nowInEnemyTerritory = isEnemyTerritory(me.curX, me.curY, 4, samuraiInfo[4]);
                     }
                 } else if(weapon%3 == 2) { //sword
                     SamuraiInfo& si = samuraiInfo[5];
-                    if(si.curX!=-1&&si.curY!=-1){
+                    if(si.curX!=-1 && si.curY!=-1 && si.curX != si.homeX && si.curY != si.homeY){
                         preInEnemyTerritory = isEnemyTerritory(oldX, oldY, 5, samuraiInfo[5]);
                         nowInEnemyTerritory = isEnemyTerritory(me.curX, me.curY, 5, samuraiInfo[5]);
                     }
                 } else if(weapon%3 == 0) { // spir
                     SamuraiInfo& si = samuraiInfo[3];
-                    if(si.curX!=-1&&si.curY!=-1){
+                    if(si.curX!=-1 && si.curY!=-1 && si.curX != si.homeX && si.curY != si.homeY){
                         preInEnemyTerritory = isEnemyTerritory(oldX, oldY, 3, samuraiInfo[3]);
                         nowInEnemyTerritory = isEnemyTerritory(me.curX, me.curY, 3, samuraiInfo[3]);
                     }
