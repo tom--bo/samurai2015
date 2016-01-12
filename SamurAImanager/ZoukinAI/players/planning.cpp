@@ -10,6 +10,8 @@ extern double avoidingMerits;
 extern double movingMerits;
 extern double doubleMerits;
 
+extern void setMerits(int weaponid);
+
 list<int> bestPlay;
 list<int> currentPlay;
 double bestMerits;
@@ -50,7 +52,7 @@ struct PlanningPlayer: Player {
     void play(GameInfo& info) {
         currentPlay.clear();
         updateMyField(info);
-        setMerits(info);
+        setMerits(info.weapon);
         bestMerits = -1;
         myTern += 1;
         SamuraiInfo& me = info.samuraiInfo[info.weapon];
@@ -71,10 +73,10 @@ struct PlanningPlayer: Player {
         for(int i=0; i<225; i++){
             int y = i/15;
             int x = i%15;
-            if(info.field[i] < 3) {
+            if(info.field[i] >= 0 && info.field[i] < 3) {
                 tmpField[x][y] = 1;
             }else if(info.field[i] < 6) {
-                tmpField[x][y] = 1;
+                tmpField[x][y] = -1;
             }
         }
         int minCost = 10;
@@ -92,37 +94,6 @@ struct PlanningPlayer: Player {
                     myfield[1] = j*3+2;
                 }
             }
-        }
-    }
-    void setMerits(GameInfo& info){
-        switch(info.weapon){
-            case 0:
-                territoryMerits = 2;
-                selfTerritoryMerits = 0.1;
-                hurtingMerits = 100;
-                hidingMerits = 0.5;
-                avoidingMerits = -3;
-                movingMerits = 0.2;               
-                doubleMerits = 50;
-                break;
-            case 1:
-                territoryMerits = 2;
-                selfTerritoryMerits = 0.1;
-                hurtingMerits = 100;
-                hidingMerits = 2;
-                avoidingMerits = -5;
-                movingMerits = 0.5;               
-                doubleMerits = 50;
-                break;
-            case 2:
-                territoryMerits = 2;
-                selfTerritoryMerits = 0.1;
-                hurtingMerits = 100;
-                hidingMerits = 1;
-                avoidingMerits = -4;
-                movingMerits = 0.5;               
-                doubleMerits = 50;
-                break;
         }
     }
 };
