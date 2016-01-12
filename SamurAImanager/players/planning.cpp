@@ -13,8 +13,8 @@ extern double doubleMerits;
 list<int> bestPlay;
 list<int> currentPlay;
 double bestMerits;
-int enemyMemory[100] = {};
-int myfield[2] = {};
+int enemyMemory[100] = {0};
+int myfield[2] = {0};
 int myTern = 0;
 
 struct PlanningPlayer: Player {
@@ -71,10 +71,10 @@ struct PlanningPlayer: Player {
         for(int i=0; i<225; i++){
             int y = i/15;
             int x = i%15;
-            if(info.field[i] < 3) {
+            if(info.field[i] >= 0 && info.field[i] < 3) {
                 tmpField[x][y] = 1;
             }else if(info.field[i] < 6) {
-                tmpField[x][y] = 1;
+                tmpField[x][y] = -1;
             }
         }
         int minCost = 10;
@@ -100,8 +100,8 @@ struct PlanningPlayer: Player {
                 territoryMerits = 2;
                 selfTerritoryMerits = 0.1;
                 hurtingMerits = 100;
-                hidingMerits = 0.2;
-                avoidingMerits = -1;
+                hidingMerits = 0.5;
+                avoidingMerits = -3;
                 movingMerits = 0.2;               
                 doubleMerits = 50;
                 break;
