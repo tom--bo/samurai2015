@@ -2,8 +2,9 @@
 #include <list>
 #include <utility>
 
-extern double territoryMerits;
-extern double selfTerritoryMerits;
+extern double enemyTerritoryMerits;
+extern double blankTerritoryMerits;
+extern double friendTerritoryMerits;
 extern double hurtingMerits;
 extern double hidingMerits;
 extern double avoidingMerits;
@@ -34,10 +35,11 @@ struct PlanningPlayer: Player {
             if (required[action] <= power && info.isValidAt(action, me.curX, me.curY, me.hidden)) {
                 currentPlay.push_back(action);
                 Undo undo;
-                int territory, selfTerritory, injury, hiding, avoiding, moving, doubleAction;
-                info.tryAction(action, undo, territory, selfTerritory, injury, hiding, avoiding, moving, myTern, enemyMemory, myfield, doubleAction);
-                double gain = territoryMerits*territory
-                    + selfTerritoryMerits*selfTerritory
+                int enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, doubleAction;
+                info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, myTern, enemyMemory, myfield, doubleAction);
+                double gain = enemyTerritoryMerits*enemyTerritory
+                    + blankTerritoryMerits*blankTerritory
+                    + friendTerritoryMerits*friendTerritory
                     + hurtingMerits*injury
                     + hidingMerits*hiding
                     + avoidingMerits*avoiding
