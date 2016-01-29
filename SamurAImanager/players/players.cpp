@@ -249,11 +249,11 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
                         int current = field[pos];
                         if (current != weapon) {
                             if (current >= 8) { // unoccupied
-                                blankTerritory += 1;
+                                blankTerritory++;
                             } else if (current < 3) { // friends' territory
-                                friendTerritory += 1;
+                                friendTerritory++;
                             } else if (current >= 3) { // opponents' territory
-                                enemyTerritory += 1;
+                                enemyTerritory++;
                             }
                             undo.recField(&field[pos]);
                         }

@@ -13,7 +13,6 @@ void setMerits(int weaponid){
         case 0:
             enemyTerritoryMerits = 2;
             blankTerritoryMerits = 1;
-            blankTerritoryMerits = 0.1;
             friendTerritoryMerits = 0.1;
             hurtingMerits = 100;
             hidingMerits = 0.1;
