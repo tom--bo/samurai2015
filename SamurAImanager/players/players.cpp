@@ -216,9 +216,9 @@ void Undo::apply() {
     for (SamuraiUndo& u: samuraiUndo) u.apply();
 }
 
-void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerritory, int& injury, int& hiding, int& avoiding, int& moving, int myTern, int enemyMemory[100], int myfield[2], int& doubleAction) {
+void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blankTerritory, int& friendTerritory, int& injury, int& hiding, int& avoiding, int& moving, int myTern, int enemyMemory[100], int myfield[2], int& doubleAction) {
     SamuraiInfo& me = samuraiInfo[weapon];
-    territory = selfTerritory = injury = hiding = avoiding = moving = doubleAction = 0;
+    enemyTerritory = blankTerritory = friendTerritory = injury = hiding = avoiding = moving = doubleAction = 0;
     switch (action) {
         case 1: case 2: case 3: case 4: { // occupation
             static const int size[3] = {4, 5, 7};
@@ -248,11 +248,12 @@ void GameInfo::tryAction(int action, Undo& undo,  int& territory, int& selfTerri
                         int pos = y*width+x;
                         int current = field[pos];
                         if (current != weapon) {
-                            selfTerritory += 1;
                             if (current >= 8) { // unoccupied
-                                territory += 1;
+                                blankTerritory++;
+                            } else if (current < 3) { // friends' territory
+                                friendTerritory++;
                             } else if (current >= 3) { // opponents' territory
-                                territory += 2;
+                                enemyTerritory++;
                             }
                             undo.recField(&field[pos]);
                         }
@@ -393,10 +394,10 @@ bool GameInfo::isEnemyTerritory(int meX, int meY, int enemyID, SamuraiInfo& si) 
 
 void GameInfo::doAction(int action) {
     Undo dummy;
-    int dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy10;
+    int dummy0, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy10;
     int dummy8[100] = {};
     int dummy9[2] = {};
-    tryAction(action, dummy, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8, dummy9, dummy10);
+    tryAction(action, dummy, dummy0, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8, dummy9, dummy10);
     cout << action << ' ';
 }
 

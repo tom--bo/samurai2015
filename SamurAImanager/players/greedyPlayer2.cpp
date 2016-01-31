@@ -1,5 +1,6 @@
-double territoryMerits;
-double selfTerritoryMerits;
+double enemyTerritoryMerits;
+double blankTerritoryMerits;
+double friendTerritoryMerits;
 double hurtingMerits;
 double hidingMerits;
 double avoidingMerits;
@@ -10,8 +11,9 @@ double doubleMerits;
 void setMerits(int weaponid){
     switch(weaponid){
         case 0:
-            territoryMerits = 3;
-            selfTerritoryMerits = 0.1;
+            enemyTerritoryMerits = 2;
+            blankTerritoryMerits = 1;
+            friendTerritoryMerits = 0.1;
             hurtingMerits = 100;
             hidingMerits = 0.1;
             avoidingMerits = -10;
@@ -19,8 +21,9 @@ void setMerits(int weaponid){
             doubleMerits = 50;
             break;
         case 1:
-            territoryMerits = 3;
-            selfTerritoryMerits = 0.1;
+            enemyTerritoryMerits = 2;
+            blankTerritoryMerits = 1;
+            friendTerritoryMerits = 0.1;
             hurtingMerits = 100;
             hidingMerits = 0.1;
             avoidingMerits = -10;
@@ -28,8 +31,9 @@ void setMerits(int weaponid){
             doubleMerits = 50;
             break;
         case 2:
-            territoryMerits = 3;
-            selfTerritoryMerits = 0.1;
+            enemyTerritoryMerits = 2;
+            blankTerritoryMerits = 1;
+            friendTerritoryMerits = 0.1;
             hurtingMerits = 100;
             hidingMerits = 0.1;
             avoidingMerits = -10;
