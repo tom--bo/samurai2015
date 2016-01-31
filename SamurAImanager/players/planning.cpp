@@ -21,9 +21,9 @@ int enemyMemory[100] = {0};
 int myfield[2] = {0};
 int myTern = 0;
 
-#define enemyTerritoryMAX 10.0
-#define blankTerritoryMAX 10.0
-#define friendTerritoryMAX 10.0
+#define enemyTerritoryMAX 5.0
+#define blankTerritoryMAX 5.0
+#define friendTerritoryMAX 5.0
 #define injuryMAX 1.0
 #define hidingMAX 1.0
 #define avoidingMAX 1.0
