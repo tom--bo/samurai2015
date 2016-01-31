@@ -5,6 +5,7 @@ double hurtingMerits;
 double hidingMerits;
 double avoidingMerits;
 double movingMerits;
+double centerMerits;
 double doubleMerits;
 
 void setMerits(int weaponid){
@@ -17,6 +18,7 @@ void setMerits(int weaponid){
             hidingMerits = 0.1;
             avoidingMerits = -10;
             movingMerits = 0.2;
+            centerMerits = 0.2;
             doubleMerits = 50;
             break;
         case 1:
@@ -27,6 +29,7 @@ void setMerits(int weaponid){
             hidingMerits = 0.1;
             avoidingMerits = -10;
             movingMerits = 0.2;
+            centerMerits = 0.2;
             doubleMerits = 50;
             break;
         case 2:
@@ -37,6 +40,7 @@ void setMerits(int weaponid){
             hidingMerits = 0.1;
             avoidingMerits = -10;
             movingMerits = 0.2;
+            centerMerits = 0.2;
             doubleMerits = 50;
             break;
     }

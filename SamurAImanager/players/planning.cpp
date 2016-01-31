@@ -9,6 +9,7 @@ extern double hurtingMerits;
 extern double hidingMerits;
 extern double avoidingMerits;
 extern double movingMerits;
+extern double centerMerits;
 extern double doubleMerits;
 
 extern void setMerits(int weaponid);
@@ -35,8 +36,8 @@ struct PlanningPlayer: Player {
             if (required[action] <= power && info.isValidAt(action, me.curX, me.curY, me.hidden)) {
                 currentPlay.push_back(action);
                 Undo undo;
-                int enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, doubleAction;
-                info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, myTern, enemyMemory, myfield, doubleAction);
+                int enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, center, doubleAction;
+                info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, center, myTern, enemyMemory, myfield, doubleAction);
                 double gain = enemyTerritoryMerits*enemyTerritory
                     + blankTerritoryMerits*blankTerritory
                     + friendTerritoryMerits*friendTerritory
@@ -44,6 +45,7 @@ struct PlanningPlayer: Player {
                     + hidingMerits*hiding
                     + avoidingMerits*avoiding
                     + movingMerits*moving
+                    + centerMerits*center
                     + doubleMerits*doubleAction;
                 plan(info, me, power-required[action], merits+gain, myTern, enemyMemory, myfield);
                 undo.apply();
