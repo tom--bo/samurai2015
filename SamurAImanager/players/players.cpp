@@ -216,9 +216,9 @@ void Undo::apply() {
     for (SamuraiUndo& u: samuraiUndo) u.apply();
 }
 
-void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blankTerritory, int& friendTerritory, int& injury, int& hiding, int& avoiding, int& moving, int myTern, int enemyMemory[100], int myfield[2], int& doubleAction) {
+void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blankTerritory, int& friendTerritory, int& injury, int& hiding, int& avoiding, int& moving, int& center, int myTern, int enemyMemory[100], int myfield[2], int& doubleAction) {
     SamuraiInfo& me = samuraiInfo[weapon];
-    enemyTerritory = blankTerritory = friendTerritory = injury = hiding = avoiding = moving = doubleAction = 0;
+    enemyTerritory = blankTerritory = friendTerritory = injury = hiding = avoiding = moving = center = doubleAction = 0;
     switch (action) {
         case 1: case 2: case 3: case 4: { // occupation
             static const int size[3] = {4, 5, 7};
@@ -372,7 +372,25 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
         avoiding++;
     }
 
-
+    // add by position (closeness from center)
+    int diffCenter = abs(me.curX - 7) + abs(me.curY - 7);
+    switch(diffCenter) {
+        case 0:  center+10; break;
+        case 1:  center+10; break;
+        case 2:  center+10; break;
+        case 3:  center+10; break;
+        case 4:  center+10; break;
+        case 5:  center+10; break;
+        case 6:  center+9 ; break;
+        case 7:  center+8 ; break;
+        case 8:  center+6 ; break;
+        case 9:  center+5 ; break;
+        case 10: center+4 ; break;
+        case 11: center+3 ; break;
+        case 12: center+2 ; break;
+        case 13: center+1 ; break;
+        case 14: center+0 ; break;
+    }
 }
 bool GameInfo::isEnemyTerritory(int meX, int meY, int enemyID, SamuraiInfo& si) {
     int diffx=abs(meX-si.curX);
@@ -394,10 +412,10 @@ bool GameInfo::isEnemyTerritory(int meX, int meY, int enemyID, SamuraiInfo& si) 
 
 void GameInfo::doAction(int action) {
     Undo dummy;
-    int dummy0, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy10;
-    int dummy8[100] = {};
-    int dummy9[2] = {};
-    tryAction(action, dummy, dummy0, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8, dummy9, dummy10);
+    int dummy0, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8, dummy11;
+    int dummy9[100] = {};
+    int dummy10[2] = {};
+    tryAction(action, dummy, dummy0, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8, dummy9, dummy10, dummy11);
     cout << action << ' ';
 }
 
