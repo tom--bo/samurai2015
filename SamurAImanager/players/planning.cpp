@@ -29,7 +29,7 @@ int myTern = 0;
 #define avoidingMAX 1.0
 #define movingMAX 1.0
 #define doubleActionMAX 1.0
-
+#define centerMAX 10.0
 
 struct PlanningPlayer: Player {
     void plan(GameInfo& info, SamuraiInfo& me, int power, double merits, int myTern, int enemyMemory[100], int myfleld[2]) {
@@ -46,7 +46,6 @@ struct PlanningPlayer: Player {
             if (required[action] <= power && info.isValidAt(action, me.curX, me.curY, me.hidden)) {
                 currentPlay.push_back(action);
                 Undo undo;
-<<<<<<< HEAD
                 int enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, doubleAction, center;
                 info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, center,myTern, enemyMemory, myfield, doubleAction);
                 double gain = enemyTerritoryMerits*enemyTerritory/enemyTerritoryMAX
@@ -56,8 +55,8 @@ struct PlanningPlayer: Player {
                     + hidingMerits*hiding/hidingMAX
                     + avoidingMerits*avoiding/avoidingMAX
                     + movingMerits*moving/movingMAX
-                    + doubleMerits*doubleAction/doubleActionMAX;
-                    + centerMerits*center
+                    + doubleMerits*doubleAction/doubleActionMAX
+                    + centerMerits*center/centerMAX;
                 plan(info, me, power-required[action], merits+gain, myTern, enemyMemory, myfield);
                 undo.apply();
                 currentPlay.pop_back();
