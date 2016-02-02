@@ -35,7 +35,7 @@ sub uniform_crossover {
 
 sub one_point_crossover {
     my ($p1, $p2) = @_;
-    my $rnd = int(rand(48));
+    my $rnd = int(rand(54));
     my $child = "";
     $child .= substr($p1, 0, $rnd);
     $child .= substr($p2, $rnd);
@@ -47,8 +47,8 @@ sub one_point_crossover {
 sub two_point_crossover {
     my ($p1, $p2) = @_;
     my $child = "";
-    my $rnd1 = int(rand(47));
-    my $rnd2 = int(rand(48-$rnd1));
+    my $rnd1 = int(rand(53));
+    my $rnd2 = int(rand(54-$rnd1));
 
     $child .= substr($p1, 0, $rnd1);
     $child .= substr($p2, $rnd1, $rnd2);
@@ -65,14 +65,13 @@ sub mutation {
         if(rand(1) < 0.05) {
             my $tmp = substr($gene, $i, 1);
             if($tmp eq "0") {
-                $mutant .= "0";
+                $gene = substr($gene, 0, $i)."1".substr($gene, ($i+1)-$i);
             }else{
-                $mutant .= "1";
+                $gene = substr($gene, 0, $i)."0".substr($gene, ($i+1)-$i);
             }
-        }else{
-            $mutant .= substr($gene, $i, 1);
         }
     }
+    $mutant = $gene;
 
     return $mutant;
 }
