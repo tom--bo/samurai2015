@@ -167,9 +167,6 @@ struct PlanningPlayer: Player {
                 }
             }   
         }
-        printMap(info.weapon+info.side*3,TureTurnNum,"enemy3possible",possibleMap[0]);
-        printMap(info.weapon+info.side*3,TureTurnNum,"enemy4possible",possibleMap[1]);
-        printMap(info.weapon+info.side*3,TureTurnNum,"enemy5possible",possibleMap[2]);
         //remain only postions which have times equals to count
         for(int enemyId=3;enemyId<6;enemyId++){
             for(int j=0;j<225;j++){
