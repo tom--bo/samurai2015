@@ -20,13 +20,10 @@ double getIntFromFS(std::ifstream& ifs){
 
 void setMerits(int weaponid){
     std::ifstream ifs("evolution/load.gen");
-    std::ofstream ofs("evolution/fileout.txt");
     std::string str;
     if (ifs.fail()){
-        ofs<<"load failed!!!!";
         return;
     }
-    ofs<<"open mid!!!";
     enemyTerritoryMerits = getIntFromFS(ifs);
     blankTerritoryMerits = getIntFromFS(ifs);;
     friendTerritoryMerits = getIntFromFS(ifs);
