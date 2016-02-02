@@ -1,7 +1,9 @@
 #include "players.hpp"
 #include <list>
 #include <utility>
-
+#include <fstream>
+#include<sstream>
+#include <iostream>
 extern double enemyTerritoryMerits;
 extern double blankTerritoryMerits;
 extern double friendTerritoryMerits;
@@ -21,6 +23,8 @@ int enemyMemory[100] = {0};
 int myfield[2] = {0};
 int myTern = 0;
 
+int oldMap[225];
+
 #define enemyTerritoryMAX 5.0
 #define blankTerritoryMAX 5.0
 #define friendTerritoryMAX 5.0
@@ -32,6 +36,37 @@ int myTern = 0;
 #define centerMAX 10.0
 
 struct PlanningPlayer: Player {
+    PlanningPlayer():Player(){
+        for(int i=0;i<225;i++){
+            oldMap[i]=8;
+        }   
+    
+    }
+    void printMap2(int pid,int turn,const char* title,int map[225]){
+        ostringstream oss;
+        oss<<"mylog/log"<<pid<<"-turn"<<turn;
+        std::ofstream ofs(oss.str(), std::ios::app );
+        ofs<<"#"<<title<<std::endl;
+        for(int y=0;y<15;y++){
+        for(int x=0;x<15;x++){
+            int tmp=15*y+x;
+            ofs<<map[tmp]<<" ";
+        }
+        ofs<<endl;
+        }
+    }
+    void printMap(int pid,int turn,const char* title,int map[15][15]){
+        ostringstream oss;
+        oss<<"mylog/log"<<pid<<"-turn"<<turn;
+        std::ofstream ofs(oss.str(), std::ios::app );
+        ofs<<"#"<<title<<std::endl;
+        for(int x=0;x<15;x++){
+        for(int y=0;y<15;y++){
+            ofs<<map[x][y]<<" ";
+        }
+        ofs<<endl;
+        }
+    }
     void plan(GameInfo& info, SamuraiInfo& me, int power, double merits, int myTern, int enemyMemory[100], int myfleld[2]) {
         if (merits > bestMerits) {
             bestMerits = merits;
@@ -67,6 +102,7 @@ struct PlanningPlayer: Player {
         currentPlay.clear();
         updateMyField(info);
         setMerits(info.weapon);
+        guessEnemyPostion(info);
         bestMerits = -1;
         myTern += 1;
         SamuraiInfo& me = info.samuraiInfo[info.weapon];
@@ -80,6 +116,84 @@ struct PlanningPlayer: Player {
         for (int action: bestPlay) {
             cout << action << ' ';
         }
+    }
+    void guessEnemyPostion(GameInfo& info){       
+        int turnOrder[6][2]={{0,7},{3,8},{4,11},{1,6},{2,9},{5,10}};
+        int TureTurnNum=turnOrder[info.weapon+3*info.side][myTern%2]+myTern/2*12;
+        int attackAreaNum[3]={16,12,8};
+        int attackAreaX[3][16]={
+            {0,0,0,0,0,0,0,0,-1,-2,-3,-4,1,2,3,4},
+            {1,1,1,2,-1,-1,-1,-2,0,0,0,0},
+            {1,1,1,-1,-1,-1,0,0}
+        };
+        int attackAreaY[3][16]={
+            {1,2,3,4,-1,-2,-3,-4,0,0,0,0,0,0,0,0},
+            {1,0,-1,0,1,0,-1,0,1,2,-1,-2},
+            {1,0,-1,1,0,-1,1,-1}
+        };
+        int diffField[15][15] = {};
+        for(int i=0;i<15;i++){
+        for(int j=0;j<15;j++){
+            diffField[j][i]=7;
+        }
+        } 
+        
+        printMap2(info.weapon+info.side*3,TureTurnNum,"real",info.field);
+        //detect difference
+        for(int i=0;i<225;i++){
+            int x=i%15;
+            int y=i/15;
+            if(oldMap[i]!=info.field[i]&&oldMap[i]!=9){
+                diffField[y][x]=info.field[i];
+            }
+        }
+
+        printMap(info.weapon+info.side*3,TureTurnNum,"diff",diffField);
+        //count enemy possible pos
+        int possibleMap[3][15][15]={};
+        int countPossiblePos[3]={};
+        for(int j=0;j<225;j++){
+            int x=j%15;
+            int y=j/15;
+            if(diffField[y][x]>=3&&diffField[y][x]<=5){
+                int enemyId=diffField[y][x];
+                countPossiblePos[enemyId-3]++;
+                //fill which xy in enemy attack area
+                for(int k=0;k<attackAreaNum[enemyId-3];k++){
+                    int tmpx=x+attackAreaX[enemyId-3][k];
+                    int tmpy=y+attackAreaY[enemyId-3][k];
+                    if(tmpx<0||tmpx>=15||tmpy<0||tmpy>=15)continue;  
+                    possibleMap[enemyId-3][tmpy][tmpx]++;
+                }
+            }   
+        }
+        printMap(info.weapon+info.side*3,TureTurnNum,"enemy3possible",possibleMap[0]);
+        printMap(info.weapon+info.side*3,TureTurnNum,"enemy4possible",possibleMap[1]);
+        printMap(info.weapon+info.side*3,TureTurnNum,"enemy5possible",possibleMap[2]);
+        //remain only postions which have times equals to count
+        for(int enemyId=3;enemyId<6;enemyId++){
+            for(int j=0;j<225;j++){
+                int x=j%15;
+                int y=j/15;
+                if(possibleMap[enemyId-3][y][x]!=countPossiblePos[enemyId-3]){
+                    possibleMap[enemyId-3][y][x]=0;
+                }
+            }   
+        }
+        printMap(info.weapon+info.side*3,TureTurnNum,"enemy3possible",possibleMap[0]);
+        printMap(info.weapon+info.side*3,TureTurnNum,"enemy4possible",possibleMap[1]);
+        printMap(info.weapon+info.side*3,TureTurnNum,"enemy5possible",possibleMap[2]);
+        
+        //eliminate possbles
+
+        //confirmEnemyPostion
+        //TODO:insert to GameInfo.emeySamurai
+
+        //save old field for next
+        for(int i=0;i<225;i++){
+            oldMap[i] = info.field[i];
+        }
+    
     }
     void updateMyField(GameInfo& info){
         int tmpField[15][15] = {};
