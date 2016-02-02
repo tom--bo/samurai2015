@@ -11,13 +11,14 @@ for(my $i=0; $i<3; $i++) {
     push @parents, &generate_gene();
 }
 
-exit;
-#??????????????? exit 
+my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+my $log_file = "ga".$mon+1.$mday."_".$hour.$min.$sec.".log";
+open(OUT, ">>$log_file") or die "$!";
 
 for(my $i=0; $i<1000; $i++) {
     my @children;
     my @merits;
-    @children = GA::generate_children(@parents);
+    @children = GA::cross_parents(@parents);
     for (my $j=0; $j<$#children+1; $j++) {
         @merits = &gene_to_merits();
         `echo $merits[0] > load.gen`;
@@ -44,6 +45,7 @@ for(my $i=0; $i<1000; $i++) {
             if($result_points[$mj] == $ma) {
                 push @parents, $result_parents[$mj];
                 $result_points[$mj] = 0;
+                print OUT $result_points[$mj].", ".$result_parents[$mj]."\n";
             }
 
         }
