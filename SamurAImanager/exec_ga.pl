@@ -10,12 +10,11 @@ my @result_points;
 for(my $i=0; $i<3; $i++) {
     push @parents, &generate_gene();
 }
-print unpack("C", pack("B8", "00".substr($parents[0], 0, 6)))."\n";
 
 exit;
 #??????????????? exit 
 
-for(my $i=0; $i<10000; $i++) {
+for(my $i=0; $i<1000; $i++) {
     my @children;
     my @merits;
     @children = GA::generate_children(@parents);

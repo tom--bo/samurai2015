@@ -1,4 +1,5 @@
 #!/bin/perl
+package GA;
 use warnings;
 use strict;
 
