@@ -3,25 +3,25 @@ use warnings;
 use strict;
 use List::Util qw(max);
 use GA;
+$| = 1;
 
 my @parents;
 my @result_children;
 my @result_points;
 
-for(my $i=0; $i<10; $i++) {
+for(my $i=0; $i<5; $i++) {
     push @parents, &generate_gene();
 }
-
 my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
 my $log_file = "logs/ga".($mon+1).$mday."_".$hour.$min.$sec.".log";
-open(OUT, ">>$log_file") or die "$!";
+open(OUT, ">> $log_file") or die "$!";
 
-for(my $i=0; $i<100; $i++) {
+for(my $i=0; $i<2000; $i++) {
     my @children;
     my @merits;
     @result_points = ();
     @result_children = ();
-    @children = GA::cross_parents(@parents);
+    @children = &GA::cross_parents(@parents);
     for (my $j=0; $j<$#children+1; $j++) {
         @merits = &gene_to_merits($children[$j]);
         `echo $merits[0] > evolution/load.gen`;
