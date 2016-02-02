@@ -20,7 +20,7 @@ sub cross_parents {
 
 sub uniform_crossover {
     my ($p1, $p2) = @_;
-    my $child;
+    my $child = "";
     for(my $i=0; $i<length($p1); $i++) {
         if(rand(1) > 0.5) {
             $child .= substr($p1, $i, 1);
@@ -35,8 +35,10 @@ sub uniform_crossover {
 
 sub one_point_crossover {
     my ($p1, $p2) = @_;
-    my $rnd = int(rand(64));
-    my $child = substr($p1, 0, $rnd).substr($p2, $rnd);
+    my $rnd = int(rand(48));
+    my $child = "";
+    $child .= substr($p1, 0, $rnd);
+    $child .= substr($p2, $rnd);
 
     my $ret = mutation($child);
     return $ret;
@@ -44,9 +46,13 @@ sub one_point_crossover {
 
 sub two_point_crossover {
     my ($p1, $p2) = @_;
-    my $rnd1 = int(rand(64));
-    my $rnd2 = int(rand(64));
-    my $child = substr($p1, 0, $rnd1).substr($p2, $rnd1, $rnd2).substr($p2, $rnd2);
+    my $child = "";
+    my $rnd1 = int(rand(47));
+    my $rnd2 = int(rand(48-$rnd1));
+
+    $child .= substr($p1, 0, $rnd1);
+    $child .= substr($p2, $rnd1, $rnd2);
+    $child .= substr($p2, $rnd1+$rnd2);
 
     my $ret = mutation($child);
     return $ret;

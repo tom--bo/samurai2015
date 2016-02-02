@@ -1,10 +1,11 @@
 #!/bin/perl
 use warnings;
 use strict;
+use List::Util qw(max);
 use GA;
 
 my @parents;
-my @result_parents;
+my @result_children;
 my @result_points;
 
 for(my $i=0; $i<3; $i++) {
@@ -12,30 +13,37 @@ for(my $i=0; $i<3; $i++) {
 }
 
 my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
-my $log_file = "ga".$mon+1.$mday."_".$hour.$min.$sec.".log";
+my $log_file = "logs/ga".($mon+1).$mday."_".$hour.$min.$sec.".log";
 open(OUT, ">>$log_file") or die "$!";
 
-for(my $i=0; $i<1000; $i++) {
+for(my $i=0; $i<3; $i++) {
     my @children;
     my @merits;
+    @result_points = ();
+    @result_children = ();
     @children = GA::cross_parents(@parents);
     for (my $j=0; $j<$#children+1; $j++) {
-        @merits = &gene_to_merits();
-        `echo $merits[0] > load.gen`;
+        @merits = &gene_to_merits($children[$j]);
+        `echo $merits[0] > evolution/load.gen`;
         for(my $k=1; $k<8; $k++) { 
-            `echo $merits[$k] >> load.gen`;
+            `echo $merits[$k] >> evolution/load.gen`;
         }
 
-        `manager/gameManager -a players/filePlayer -p "" -u "" -n "greedy0" -r 1 -s 100 -a players/greedyPlayer1 -p "" -u "" -n "greedy1" -r 2 -s 98 -a players/greedyPlayer2 -p "" -u "" -n "greedy2" -r 3 -s 70 -a players/greedyPlayer3 -p "" -u "" -n "greedy3" -r 3 -s 60 -a players/greedyPlayer4 -p "" -u "" -n "greedy4" -r 3 -s 50 -a players/greedyPlayer5 -p "" -u "" -n "greedy5" -r 3 -s 40 -t`;
+        `manager/gameManager -a players/filePlayer -p "" -u "" -n "greedy0" -r 1 -s 100 -a players/greedyPlayer1 -p "" -u "" -n "greedy1" -r 2 -s 98 -a players/greedyPlayer2 -p "" -u "" -n "greedy2" -r 3 -s 70 -a players/greedyPlayer3 -p "" -u "" -n "greedy3" -r 3 -s 60 -a players/greedyPlayer4 -p "" -u "" -n "greedy4" -r 3 -s 50 -a players/greedyPlayer5 -p "" -u "" -n "greedy5" -r 3 -s 40 > result.txt`;
 
         my $point;
-        open(IN, "file.gen");
+        open(IN, "result.txt");
         while(<IN>) {
-            $point = chomp($_);
+            if($_ =~ /\[(.*)\]/) {
+                my @scores = split(/,/, $1);
+                $point = $scores[0]; 
+                last;
+            }
         }
         close(IN);
+        unlink("result.txt");
 
-        push @result_parents, $parents[$j];
+        push @result_children, $children[$j];
         push @result_points, $point;
     }
     @parents = ();
@@ -43,14 +51,14 @@ for(my $i=0; $i<1000; $i++) {
         my $ma = max(@result_points);
         for(my $mj=0; $mj<$#result_points+1; $mj++) {
             if($result_points[$mj] == $ma) {
-                push @parents, $result_parents[$mj];
+                push @parents, $result_children[$mj];
+                print OUT $result_points[$mj].", ".$result_children[$mj]."\n";
                 $result_points[$mj] = 0;
-                print OUT $result_points[$mj].", ".$result_parents[$mj]."\n";
+                last;
             }
-
         }
     }
-    @children = GA::cross_parents(@parents);
+    # @children = GA::cross_parents(@parents);
 
 }
 
@@ -65,11 +73,17 @@ sub generate_gene(){
 
 sub gene_to_merits{
     my ($gene) = @_;
-    my @merits;
+    my @merits = ();
     for(my $i=0; $i<8; $i++) {
         push @merits, unpack("C", pack("B8", "00".substr($gene, $i*6, 6)));
     }
 
     return @merits;
+}
+
+sub trim_space {
+    my $val = shift;
+    $val =~ s/^ *(.*?) *$/$1/;
+    return $val;
 }
 
