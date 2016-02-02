@@ -182,6 +182,21 @@ struct PlanningPlayer: Player {
         printMap(info.weapon+info.side*3,TureTurnNum,"enemy5possible",possibleMap[2]);
         
         //eliminate possbles
+        
+        //eliminate by empty and not yours but outOfSight
+        for(int enemyId=3;enemyId<6;enemyId++){
+            for(int j=0;j<225;j++){
+                int x=j%15;
+                int y=j/15;
+                if(possibleMap[enemyId-3][y][x]>0&&info.field[j]!=enemyId&&info.field[j]!=9){
+                    possibleMap[enemyId-3][y][x]=0;
+                }
+            }   
+        }
+        printMap(info.weapon+info.side*3,TureTurnNum,"enemy3possible",possibleMap[0]);
+        printMap(info.weapon+info.side*3,TureTurnNum,"enemy4possible",possibleMap[1]);
+        printMap(info.weapon+info.side*3,TureTurnNum,"enemy5possible",possibleMap[2]);
+        
 
         //confirmEnemyPostion
         //TODO:insert to GameInfo.emeySamurai
