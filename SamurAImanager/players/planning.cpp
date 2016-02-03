@@ -122,7 +122,8 @@ struct PlanningPlayer: Player {
     }
     void guessEnemyPostion(GameInfo& info){       
         int turnOrder[6][2]={{0,7},{3,8},{4,11},{1,6},{2,9},{5,10}};
-        int TureTurnNum=turnOrder[info.weapon+3*info.side][myTern%2]+(myTern/2)*12;
+        //int TureTurnNum=turnOrder[info.weapon+3*info.side][myTern%2]+(myTern/2)*12;
+        int TureTurnNum=info.turn;
         int attackAreaNum[3]={16,12,8};
         int attackAreaX[3][16]={
             {0,0,0,0,0,0,0,0,-1,-2,-3,-4,1,2,3,4},
