@@ -143,16 +143,21 @@ struct PlanningPlayer: Player {
         };
         int diffField[15][15] = {};
         for(int i=0;i<15;i++){
-        for(int j=0;j<15;j++){
-            diffField[j][i]=7;
+            for(int j=0;j<15;j++){
+                diffField[j][i]=7;
+            }
         }
-        }
+
+        //print default infomations
         for(int i=0;i<6;i++){
             ostringstream oss;
             oss<<"agent"<<i <<" "<<info.samuraiInfo[i].curX<<","<<info.samuraiInfo[i].curY;
             printStr(playerIndex,TureTurnNum,oss.str().c_str());
         }
         printMap2(playerIndex,TureTurnNum,"real",info.field);
+
+
+
         //detect difference
         for(int i=0;i<225;i++){
             int x=i%15;
@@ -161,9 +166,10 @@ struct PlanningPlayer: Player {
                 diffField[y][x]=info.field[i];
             }
         }
-
         printMap(playerIndex,TureTurnNum,"diff",diffField);
-        //count enemy possible pos
+
+
+        //fill enemy possible pos
         int possibleMap[3][15][15]={};
         int countPossiblePos[3]={};
         for(int j=0;j<225;j++){
@@ -194,9 +200,12 @@ struct PlanningPlayer: Player {
         printMap(playerIndex,TureTurnNum,"enemy3possible",possibleMap[0]);
         printMap(playerIndex,TureTurnNum,"enemy4possible",possibleMap[1]);
         printMap(playerIndex,TureTurnNum,"enemy5possible",possibleMap[2]);
-        
+       
+
+        //
         //eliminate possbles
-        
+        //
+
         //eliminate by empty and not your team's but outOfSight
         for(int enemyId=3;enemyId<6;enemyId++){
             for(int j=0;j<225;j++){
@@ -228,7 +237,7 @@ struct PlanningPlayer: Player {
         printMap(playerIndex,TureTurnNum,"enemy5possible",possibleMap[2]);
         
         //confirmEnemyPostion
-        //confirm when enemy was inSight before and now the pospos is beside of before postion 
+        //confirm when you know where enemy was before turn and now the pospos is beside of before postion 
         for(int enemyId=3;enemyId<6;enemyId++){
             if(oldEnemyPostionX[enemyId-3]==-1&&oldEnemyPostionY[enemyId-3]==-1)continue;
             int count=0,confirmX=-1,confirmY=-1;
@@ -247,6 +256,7 @@ struct PlanningPlayer: Player {
                 if(diffx+diffy==1){
                     SamuraiInfo& si=info.samuraiInfo[enemyId];
                     if(si.hidden==0){
+                        //if you can see enemy and not equaled to confirmXY, its error!!
                         if(si.curX!=confirmX&&si.curY!=confirmY){
                             cerr<<"postion conflict error!!!! when t="<<TureTurnNum<<" enemy="<<enemyId<<std::endl;
                         
