@@ -20,7 +20,7 @@ my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
 my $log_file = "logs/p".$player."_".($mon+1)."m".$mday."d_".$hour."h".$min."m".$sec.".log";
 open(OUT, ">> $log_file") or die "$!";
 
-for(my $i=0; $i<20; $i++) {
+for(my $i=0; $i<200; $i++) {
     my @children;
     my @merits;
     @result_points = ();
@@ -62,7 +62,12 @@ for(my $i=0; $i<20; $i++) {
         for(my $mj=0; $mj<$#result_points+1; $mj++) {
             if($result_points[$mj] == $ma) {
                 push @parents, $result_children[$mj];
-                print OUT $result_points[$mj].", ".$result_children[$mj]."\n";
+                print OUT $result_points[$mj].", ";
+                my @tmp = &gene_to_merits($result_children[$mj]);
+                for(my $mk=0; $mk<9; $mk++) {
+                    print OUT $tmp[$mk].", ";
+                }
+                print OUT "\n";
                 $result_points[$mj] = 0;
                 last;
             }
