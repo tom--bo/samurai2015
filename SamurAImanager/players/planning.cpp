@@ -46,6 +46,7 @@ struct PlanningPlayer: Player {
     
     }
     void printMap2(int pid,int turn,const char* title,int map[225]){
+        return;
         ostringstream oss;
         oss<<"mylog/log"<<pid<<"-turn"<<turn;
         std::ofstream ofs(oss.str(), std::ios::app );
@@ -59,6 +60,7 @@ struct PlanningPlayer: Player {
         }
     }
     void printMap(int pid,int turn,const char* title,int map[15][15]){
+        return;
         ostringstream oss;
         oss<<"mylog/log"<<pid<<"-turn"<<turn;
         std::ofstream ofs(oss.str(), std::ios::app );
@@ -71,6 +73,7 @@ struct PlanningPlayer: Player {
         }
     }
     void printStr(int pid,int turn ,const char* str){
+        return;
         ostringstream oss;
         oss<<"mylog/log"<<pid<<"-turn"<<turn;
         std::ofstream ofs(oss.str(), std::ios::app );
@@ -268,7 +271,7 @@ struct PlanningPlayer: Player {
                     ostringstream oss;
                     oss<<"#define enemy"<<enemyId<<" to "<<confirmX<<","<<confirmY;
                     printStr(playerIndex,TureTurnNum,oss.str().c_str());
-                    cerr<<playerIndex<<" "<<TureTurnNum<<" " << oss.str().c_str()<<std::endl; 
+                    //cerr<<playerIndex<<" "<<TureTurnNum<<" " << oss.str().c_str()<<std::endl; 
                 }
             }
         }
