@@ -261,7 +261,7 @@ struct PlanningPlayer: Player {
                     if(si.hidden==0){
                         //if you can see enemy and not equaled to confirmXY, its error!!
                         if(si.curX!=confirmX&&si.curY!=confirmY){
-                            cerr<<"postion conflict error!!!! when t="<<TureTurnNum<<" enemy="<<enemyId<<std::endl;
+                            //cerr<<"postion conflict error!!!! when t="<<TureTurnNum<<" enemy="<<enemyId<<std::endl;
                         
                         }
                         continue;
