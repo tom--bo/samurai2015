@@ -1,4 +1,5 @@
 #!/bin/sh
+rm mylog/*
 manager/gameManager \
     -a players/filePlayer -p "" -u "" -n "file" -r 1 -s 100 \
     -a players/greedyPlayer1 -p "" -u "" -n "greedy1" -r 2 -s 98 \
