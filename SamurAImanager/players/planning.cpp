@@ -217,10 +217,25 @@ struct PlanningPlayer: Player {
         printMap(info.weapon+info.side*3,TureTurnNum,"enemy4possible",possibleMap[1]);
         printMap(info.weapon+info.side*3,TureTurnNum,"enemy5possible",possibleMap[2]);
         
-
-
         //confirmEnemyPostion
         //TODO:insert to GameInfo.emeySamurai
+        
+        for(int enemyId=3;enemyId<6;enemyId++){
+            int count=0,confirmX=-1,confirmY=-1;
+            for(int j=0;j<225;j++){
+                int x=j%15;
+                int y=j/15;
+                if(possibleMap[enemyId-3][y][x]>0){
+                    count++;
+                    confirmX=x;
+                    confirmY=y;
+                }
+            }
+            if(count==1){
+                info.samuraiInfo[enemyId].curX=confirmX;
+                info.samuraiInfo[enemyId].curY=confirmY;
+            }
+        }
 
         //save old field for next
         for(int i=0;i<225;i++){
