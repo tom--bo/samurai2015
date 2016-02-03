@@ -4,6 +4,8 @@
 #include <fstream>
 #include<sstream>
 #include <iostream>
+#include<iomanip>
+#include <unistd.h>
 extern double enemyTerritoryMerits;
 extern double blankTerritoryMerits;
 extern double friendTerritoryMerits;
@@ -24,7 +26,8 @@ int myfield[2] = {0};
 int myTern = 0;
 
 int oldMap[225];
-
+int oldEnemyPostionX[3]={};
+int oldEnemyPostionY[3]={};
 #define enemyTerritoryMAX 5.0
 #define blankTerritoryMAX 5.0
 #define friendTerritoryMAX 5.0
@@ -115,11 +118,11 @@ struct PlanningPlayer: Player {
         plan(info, info.samuraiInfo[info.weapon], 7, 0, myTern, enemyMemory, myfield);
         for (int action: bestPlay) {
             cout << action << ' ';
-        }
+        }        
     }
     void guessEnemyPostion(GameInfo& info){       
         int turnOrder[6][2]={{0,7},{3,8},{4,11},{1,6},{2,9},{5,10}};
-        int TureTurnNum=turnOrder[info.weapon+3*info.side][myTern%2]+myTern/2*12;
+        int TureTurnNum=turnOrder[info.weapon+3*info.side][myTern%2]+(myTern/2)*12;
         int attackAreaNum[3]={16,12,8};
         int attackAreaX[3][16]={
             {0,0,0,0,0,0,0,0,-1,-2,-3,-4,1,2,3,4},
@@ -136,8 +139,8 @@ struct PlanningPlayer: Player {
         for(int j=0;j<15;j++){
             diffField[j][i]=7;
         }
-        } 
-        
+        }
+        //std::cerr<<"aaaaaa "<<info.turn<<" bbbbb"<<TureTurnNum<<std::endl;
         printMap2(info.weapon+info.side*3,TureTurnNum,"real",info.field);
         //detect difference
         for(int i=0;i<225;i++){
@@ -197,6 +200,23 @@ struct PlanningPlayer: Player {
         printMap(info.weapon+info.side*3,TureTurnNum,"enemy4possible",possibleMap[1]);
         printMap(info.weapon+info.side*3,TureTurnNum,"enemy5possible",possibleMap[2]);
         
+        //eliminate by oldEnemyPostion
+        for(int enemyId=3;enemyId<6;enemyId++){
+            if(oldEnemyPostionX[enemyId-3]==-1&&oldEnemyPostionY[enemyId-3]==-1)continue;
+            for(int j=0;j<225;j++){
+                int x=j%15;
+                int y=j/15;
+                if(possibleMap[enemyId-3][y][x]>0){
+                    if(abs(x-oldEnemyPostionX[enemyId-3])+abs(y-oldEnemyPostionY[enemyId-3])<=1){continue;}
+                    possibleMap[enemyId-3][y][x]=0;
+                }
+            }   
+        }
+        printMap(info.weapon+info.side*3,TureTurnNum,"enemy3possible",possibleMap[0]);
+        printMap(info.weapon+info.side*3,TureTurnNum,"enemy4possible",possibleMap[1]);
+        printMap(info.weapon+info.side*3,TureTurnNum,"enemy5possible",possibleMap[2]);
+        
+
 
         //confirmEnemyPostion
         //TODO:insert to GameInfo.emeySamurai
@@ -204,6 +224,10 @@ struct PlanningPlayer: Player {
         //save old field for next
         for(int i=0;i<225;i++){
             oldMap[i] = info.field[i];
+        }
+        for(int id=3;id<6;id++){
+            oldEnemyPostionX[id-3]=info.samuraiInfo[id].curX;
+            oldEnemyPostionY[id-3]=info.samuraiInfo[id].curY;
         }
     
     }
