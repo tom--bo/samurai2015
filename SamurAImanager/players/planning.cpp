@@ -70,6 +70,12 @@ struct PlanningPlayer: Player {
         ofs<<endl;
         }
     }
+    void printStr(int pid,int turn ,const char* str){
+        ostringstream oss;
+        oss<<"mylog/log"<<pid<<"-turn"<<turn;
+        std::ofstream ofs(oss.str(), std::ios::app );
+        ofs<<"#"<<str<<std::endl;
+    }
     void plan(GameInfo& info, SamuraiInfo& me, int power, double merits, int myTern, int enemyMemory[100], int myfleld[2]) {
         if (merits > bestMerits) {
             bestMerits = merits;
@@ -122,8 +128,8 @@ struct PlanningPlayer: Player {
     }
     void guessEnemyPostion(GameInfo& info){       
         int turnOrder[6][2]={{0,7},{3,8},{4,11},{1,6},{2,9},{5,10}};
-        //int TureTurnNum=turnOrder[info.weapon+3*info.side][myTern%2]+(myTern/2)*12;
         int TureTurnNum=info.turn;
+        int playerIndex=info.weapon+3*info.side;
         int attackAreaNum[3]={16,12,8};
         int attackAreaX[3][16]={
             {0,0,0,0,0,0,0,0,-1,-2,-3,-4,1,2,3,4},
@@ -141,8 +147,12 @@ struct PlanningPlayer: Player {
             diffField[j][i]=7;
         }
         }
-        //std::cerr<<"aaaaaa "<<info.turn<<" bbbbb"<<TureTurnNum<<std::endl;
-        printMap2(info.weapon+info.side*3,TureTurnNum,"real",info.field);
+        for(int i=0;i<6;i++){
+            ostringstream oss;
+            oss<<"agent"<<i <<" "<<info.samuraiInfo[i].curX<<","<<info.samuraiInfo[i].curY;
+            printStr(playerIndex,TureTurnNum,oss.str().c_str());
+        }
+        printMap2(playerIndex,TureTurnNum,"real",info.field);
         //detect difference
         for(int i=0;i<225;i++){
             int x=i%15;
@@ -152,7 +162,7 @@ struct PlanningPlayer: Player {
             }
         }
 
-        printMap(info.weapon+info.side*3,TureTurnNum,"diff",diffField);
+        printMap(playerIndex,TureTurnNum,"diff",diffField);
         //count enemy possible pos
         int possibleMap[3][15][15]={};
         int countPossiblePos[3]={};
@@ -181,9 +191,9 @@ struct PlanningPlayer: Player {
                 }
             }   
         }
-        printMap(info.weapon+info.side*3,TureTurnNum,"enemy3possible",possibleMap[0]);
-        printMap(info.weapon+info.side*3,TureTurnNum,"enemy4possible",possibleMap[1]);
-        printMap(info.weapon+info.side*3,TureTurnNum,"enemy5possible",possibleMap[2]);
+        printMap(playerIndex,TureTurnNum,"enemy3possible",possibleMap[0]);
+        printMap(playerIndex,TureTurnNum,"enemy4possible",possibleMap[1]);
+        printMap(playerIndex,TureTurnNum,"enemy5possible",possibleMap[2]);
         
         //eliminate possbles
         
@@ -197,9 +207,9 @@ struct PlanningPlayer: Player {
                 }
             }   
         }
-        printMap(info.weapon+info.side*3,TureTurnNum,"enemy3possible",possibleMap[0]);
-        printMap(info.weapon+info.side*3,TureTurnNum,"enemy4possible",possibleMap[1]);
-        printMap(info.weapon+info.side*3,TureTurnNum,"enemy5possible",possibleMap[2]);
+        printMap(playerIndex,TureTurnNum,"enemy3possible",possibleMap[0]);
+        printMap(playerIndex,TureTurnNum,"enemy4possible",possibleMap[1]);
+        printMap(playerIndex,TureTurnNum,"enemy5possible",possibleMap[2]);
         
         //eliminate by oldEnemyPostion
         for(int enemyId=3;enemyId<6;enemyId++){
@@ -213,14 +223,14 @@ struct PlanningPlayer: Player {
                 }
             }   
         }
-        printMap(info.weapon+info.side*3,TureTurnNum,"enemy3possible",possibleMap[0]);
-        printMap(info.weapon+info.side*3,TureTurnNum,"enemy4possible",possibleMap[1]);
-        printMap(info.weapon+info.side*3,TureTurnNum,"enemy5possible",possibleMap[2]);
+        printMap(playerIndex,TureTurnNum,"enemy3possible",possibleMap[0]);
+        printMap(playerIndex,TureTurnNum,"enemy4possible",possibleMap[1]);
+        printMap(playerIndex,TureTurnNum,"enemy5possible",possibleMap[2]);
         
         //confirmEnemyPostion
-        //TODO:insert to GameInfo.emeySamurai
-        
+        //confirm when enemy was inSight before and now the pospos is beside of before postion 
         for(int enemyId=3;enemyId<6;enemyId++){
+            if(oldEnemyPostionX[enemyId-3]==-1&&oldEnemyPostionY[enemyId-3]==-1)continue;
             int count=0,confirmX=-1,confirmY=-1;
             for(int j=0;j<225;j++){
                 int x=j%15;
@@ -232,8 +242,24 @@ struct PlanningPlayer: Player {
                 }
             }
             if(count==1){
-                info.samuraiInfo[enemyId].curX=confirmX;
-                info.samuraiInfo[enemyId].curY=confirmY;
+                int diffx=abs(confirmX-oldEnemyPostionX[enemyId-3]);
+                int diffy=abs(confirmY-oldEnemyPostionY[enemyId-3]);
+                if(diffx+diffy==1){
+                    SamuraiInfo& si=info.samuraiInfo[enemyId];
+                    if(si.hidden==0){
+                        if(si.curX!=confirmX&&si.curY!=confirmY){
+                            cerr<<"postion conflict error!!!! when t="<<TureTurnNum<<" enemy="<<enemyId<<std::endl;
+                        
+                        }
+                        continue;
+                    }
+                    info.samuraiInfo[enemyId].curX=confirmX;
+                    info.samuraiInfo[enemyId].curY=confirmY;
+                    ostringstream oss;
+                    oss<<"#define enemy"<<enemyId<<" to "<<confirmX<<","<<confirmY;
+                    printStr(playerIndex,TureTurnNum,oss.str().c_str());
+                    cerr<<playerIndex<<" "<<TureTurnNum<<" " << oss.str().c_str()<<std::endl; 
+                }
             }
         }
 
