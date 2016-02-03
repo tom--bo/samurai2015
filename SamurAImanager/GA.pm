@@ -62,7 +62,7 @@ sub mutation {
     my ($gene) = @_;
     my $mutant;
     for(my $i=0; $i<length($gene); $i++) {
-        if(rand(10) < 1) {
+        if(rand(100) < 5) {
             my $tmp = substr($gene, $i, 1);
             if($tmp eq "0") {
                 $gene = substr($gene, 0, $i)."1".substr($gene, ($i+1), (length($gene)-$i));

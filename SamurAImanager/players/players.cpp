@@ -369,7 +369,7 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
         }
     }
     if(isDanger){
-        avoiding++;
+        avoiding--;
     }
 
     // add by position (closeness from center)
