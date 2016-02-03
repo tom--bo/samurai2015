@@ -17,10 +17,10 @@ for(my $i=0; $i<10; $i++) {
     push @parents, &generate_gene();
 }
 my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
-my $log_file = "logs/p"i.$player."_".($mon+1)."m".$mday."d_".$hour."h".$min."m".$sec.".log";
+my $log_file = "logs/p".$player."_".($mon+1)."m".$mday."d_".$hour."h".$min."m".$sec.".log";
 open(OUT, ">> $log_file") or die "$!";
 
-for(my $i=0; $i<500; $i++) {
+for(my $i=0; $i<20; $i++) {
     my @children;
     my @merits;
     @result_points = ();
