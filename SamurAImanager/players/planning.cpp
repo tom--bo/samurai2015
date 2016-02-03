@@ -187,12 +187,12 @@ struct PlanningPlayer: Player {
         
         //eliminate possbles
         
-        //eliminate by empty and not yours but outOfSight
+        //eliminate by empty and not your team's but outOfSight
         for(int enemyId=3;enemyId<6;enemyId++){
             for(int j=0;j<225;j++){
                 int x=j%15;
                 int y=j/15;
-                if(possibleMap[enemyId-3][y][x]>0&&info.field[j]!=enemyId&&info.field[j]!=9){
+                if(possibleMap[enemyId-3][y][x]>0&&(info.field[j]<3||info.field[j]==8)){
                     possibleMap[enemyId-3][y][x]=0;
                 }
             }   
