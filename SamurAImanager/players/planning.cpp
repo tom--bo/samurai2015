@@ -28,6 +28,7 @@ int myTern = 0;
 int oldMap[225];
 int oldEnemyPostionX[3]={};
 int oldEnemyPostionY[3]={};
+int oldTurnNum=-1;
 #define enemyTerritoryMAX 5.0
 #define blankTerritoryMAX 5.0
 #define friendTerritoryMAX 5.0
@@ -38,6 +39,15 @@ int oldEnemyPostionY[3]={};
 #define doubleActionMAX 1.0
 #define centerMAX 10.0
 
+
+void printParam(int i){
+
+cerr<<"#player"<<i<<" "<<enemyTerritoryMerits<<" "<<blankTerritoryMerits<<" "<<friendTerritoryMerits<<" "<<hurtingMerits<<" "<<hidingMerits<<" "<<avoidingMerits<<" "<<movingMerits<<" "<<centerMerits<<" "<<doubleMerits<<endl;
+
+
+
+}
+
 struct PlanningPlayer: Player {
     PlanningPlayer():Player(){
         for(int i=0;i<225;i++){
@@ -46,7 +56,6 @@ struct PlanningPlayer: Player {
     
     }
     void printMap2(int pid,int turn,const char* title,int map[225]){
-        return;
         ostringstream oss;
         oss<<"mylog/log"<<pid<<"-turn"<<turn;
         std::ofstream ofs(oss.str(), std::ios::app );
@@ -60,7 +69,6 @@ struct PlanningPlayer: Player {
         }
     }
     void printMap(int pid,int turn,const char* title,int map[15][15]){
-        return;
         ostringstream oss;
         oss<<"mylog/log"<<pid<<"-turn"<<turn;
         std::ofstream ofs(oss.str(), std::ios::app );
@@ -73,7 +81,6 @@ struct PlanningPlayer: Player {
         }
     }
     void printStr(int pid,int turn ,const char* str){
-        return;
         ostringstream oss;
         oss<<"mylog/log"<<pid<<"-turn"<<turn;
         std::ofstream ofs(oss.str(), std::ios::app );
@@ -159,7 +166,43 @@ struct PlanningPlayer: Player {
         }
         printMap2(playerIndex,TureTurnNum,"real",info.field);
 
+        //check for escape memory
+        //if you dead, escape oldmap and oldEnemy
+        if((TureTurnNum-oldTurnNum)/12>0){
+            for(int i=0;i<6;i++){
+                oldEnemyPostionX[i-3]=-1;
+                oldEnemyPostionY[i-3]=-1;
+            }
+            for(int i=0;i<225;i++){
+                oldMap[i]=9;
+            }
+        }
 
+        for(int i=3;i<6;i++){
+            if(i%3==info.weapon){
+                int isEnemyDoubled=0;
+                if((TureTurnNum%12)%2==1){isEnemyDoubled=1;}
+                if(isEnemyDoubled){
+                    oldEnemyPostionX[i-3]=-1;
+                    oldEnemyPostionY[i-3]=-1;
+                }
+                else{
+                    if(oldEnemyPostionX[i-3]==-1&&oldEnemyPostionY[i-3]==-1)continue;
+                    if(info.samuraiInfo[i].hidden==0&&info.samuraiInfo[i].curX!=oldEnemyPostionX[i-3]&&info.samuraiInfo[i].curY!=oldEnemyPostionY[i-3])
+                    {
+                        SamuraiInfo& si=info.samuraiInfo[i];
+                        if(si.curX==si.homeX&&si.curY==si.homeY)continue;//when enemy dead
+                        cerr<<"At turn"<<TureTurnNum <<" double action fill by old is Error!!!!"<<endl;
+                        cerr<<"old: "<<oldEnemyPostionX[i-3]<<","<<oldEnemyPostionY[i-3]<<endl; 
+                        cerr<<"now: "<<info.samuraiInfo[i].curX<<","<<info.samuraiInfo[i].curY<<endl;
+                        continue;
+                    }
+                    info.samuraiInfo[i].curX=oldEnemyPostionX[i-3];
+                    info.samuraiInfo[i].curY=oldEnemyPostionY[i-3];
+                }
+
+            }
+        }
 
         //detect difference
         for(int i=0;i<225;i++){
@@ -260,9 +303,10 @@ struct PlanningPlayer: Player {
                     SamuraiInfo& si=info.samuraiInfo[enemyId];
                     if(si.hidden==0){
                         //if you can see enemy and not equaled to confirmXY, its error!!
-                        if(si.curX!=confirmX&&si.curY!=confirmY){
-                            //cerr<<"postion conflict error!!!! when t="<<TureTurnNum<<" enemy="<<enemyId<<std::endl;
-                        
+                        if(si.curX!=confirmX||si.curY!=confirmY){
+                            if(info.field[si.curX+si.curY*15]<3||info.field[si.curX+si.curY*15]==8)continue;
+                            cerr<<"postion conflict error!!!! when t="<<TureTurnNum<<" enemy="<<enemyId<<std::endl;
+                            printParam(playerIndex); 
                         }
                         continue;
                     }
@@ -284,6 +328,7 @@ struct PlanningPlayer: Player {
             oldEnemyPostionX[id-3]=info.samuraiInfo[id].curX;
             oldEnemyPostionY[id-3]=info.samuraiInfo[id].curY;
         }
+        oldTurnNum=TureTurnNum;
     
     }
     void updateMyField(GameInfo& info){
