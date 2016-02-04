@@ -216,7 +216,7 @@ struct PlanningPlayer: Player {
 
 
         //fill enemy possible pos
-        int possibleMap[3][15][15]={};
+        int possibleOccupyMap[3][15][15]={};
         int countPossiblePos[3]={};
         for(int j=0;j<225;j++){
             int x=j%15;
@@ -229,7 +229,7 @@ struct PlanningPlayer: Player {
                     int tmpx=x+attackAreaX[enemyId-3][k];
                     int tmpy=y+attackAreaY[enemyId-3][k];
                     if(tmpx<0||tmpx>=15||tmpy<0||tmpy>=15)continue;  
-                    possibleMap[enemyId-3][tmpy][tmpx]++;
+                    possibleOccupyMap[enemyId-3][tmpy][tmpx]++;
                 }
             }   
         }
@@ -238,50 +238,38 @@ struct PlanningPlayer: Player {
             for(int j=0;j<225;j++){
                 int x=j%15;
                 int y=j/15;
-                if(possibleMap[enemyId-3][y][x]!=countPossiblePos[enemyId-3]){
-                    possibleMap[enemyId-3][y][x]=0;
+                if(possibleOccupyMap[enemyId-3][y][x]!=countPossiblePos[enemyId-3]){
+                    possibleOccupyMap[enemyId-3][y][x]=0;
                 }
             }   
         }
-        printMap(playerIndex,TureTurnNum,"enemy3possible",possibleMap[0]);
-        printMap(playerIndex,TureTurnNum,"enemy4possible",possibleMap[1]);
-        printMap(playerIndex,TureTurnNum,"enemy5possible",possibleMap[2]);
+        printMap(playerIndex,TureTurnNum,"enemy3possible",possibleOccupyMap[0]);
+        printMap(playerIndex,TureTurnNum,"enemy4possible",possibleOccupyMap[1]);
+        printMap(playerIndex,TureTurnNum,"enemy5possible",possibleOccupyMap[2]);
        
 
         //
-        //eliminate possbles
+        //eliminate possbles to occupy
         //
 
-        //eliminate by empty and not your team's but outOfSight
-        for(int enemyId=3;enemyId<6;enemyId++){
-            for(int j=0;j<225;j++){
-                int x=j%15;
-                int y=j/15;
-                if(possibleMap[enemyId-3][y][x]>0&&(info.field[j]<3||info.field[j]==8)){
-                    possibleMap[enemyId-3][y][x]=0;
-                }
-            }   
-        }
-        printMap(playerIndex,TureTurnNum,"enemy3possible",possibleMap[0]);
-        printMap(playerIndex,TureTurnNum,"enemy4possible",possibleMap[1]);
-        printMap(playerIndex,TureTurnNum,"enemy5possible",possibleMap[2]);
-        
         //eliminate by oldEnemyPostion
         for(int enemyId=3;enemyId<6;enemyId++){
             if(oldEnemyPostionX[enemyId-3]==-1&&oldEnemyPostionY[enemyId-3]==-1)continue;
             for(int j=0;j<225;j++){
                 int x=j%15;
                 int y=j/15;
-                if(possibleMap[enemyId-3][y][x]>0){
+                if(possibleOccupyMap[enemyId-3][y][x]>0){
                     if(abs(x-oldEnemyPostionX[enemyId-3])+abs(y-oldEnemyPostionY[enemyId-3])<=1){continue;}
-                    possibleMap[enemyId-3][y][x]=0;
+                    possibleOccupyMap[enemyId-3][y][x]=0;
                 }
             }   
         }
-        printMap(playerIndex,TureTurnNum,"enemy3possible",possibleMap[0]);
-        printMap(playerIndex,TureTurnNum,"enemy4possible",possibleMap[1]);
-        printMap(playerIndex,TureTurnNum,"enemy5possible",possibleMap[2]);
-        
+        printMap(playerIndex,TureTurnNum,"enemy3possible by oldEnemyPos",possibleOccupyMap[0]);
+        printMap(playerIndex,TureTurnNum,"enemy4possible by oldEnemyPos",possibleOccupyMap[1]);
+        printMap(playerIndex,TureTurnNum,"enemy5possible by oldEnemyPos",possibleOccupyMap[2]);
+       
+         
+
         //confirmEnemyPostion
         //confirm when you know where enemy was before turn and now the pospos is beside of before postion 
         for(int enemyId=3;enemyId<6;enemyId++){
@@ -290,7 +278,7 @@ struct PlanningPlayer: Player {
             for(int j=0;j<225;j++){
                 int x=j%15;
                 int y=j/15;
-                if(possibleMap[enemyId-3][y][x]>0){
+                if(possibleOccupyMap[enemyId-3][y][x]>0){
                     count++;
                     confirmX=x;
                     confirmY=y;
@@ -313,12 +301,71 @@ struct PlanningPlayer: Player {
                     info.samuraiInfo[enemyId].curX=confirmX;
                     info.samuraiInfo[enemyId].curY=confirmY;
                     ostringstream oss;
-                    oss<<"#define enemy"<<enemyId<<" to "<<confirmX<<","<<confirmY;
+                    oss<<"#define enemy"<<enemyId<<" to "<<confirmX<<","<<confirmY<<" by ocupyPos and oldEnemy";
                     printStr(playerIndex,TureTurnNum,oss.str().c_str());
                     //cerr<<playerIndex<<" "<<TureTurnNum<<" " << oss.str().c_str()<<std::endl; 
                 }
             }
         }
+
+        //estimate enemy pos
+        int possibleEnemyMap[3][15][15]={};
+        for(int enemyId=3;enemyId<6;enemyId++){
+            SamuraiInfo& si=info.samuraiInfo[enemyId];
+            if(si.curX!=-1||si.curY!=-1)continue;
+            for(int j=0;j<225;j++){
+                int x=j%15;
+                int y=j/15;
+                if(possibleOccupyMap[enemyId-3][y][x]>0){
+                    possibleEnemyMap[enemyId-3][y][x]+=1;
+                    if(y>0){possibleEnemyMap[enemyId-3][y-1][x]+=1;}
+                    if(x>0){possibleEnemyMap[enemyId-3][y][x-1]+=1;}
+                    if(y<14){possibleEnemyMap[enemyId-3][y+1][x]+=1;}
+                    if(x<14){possibleEnemyMap[enemyId-3][y][x+1]+=1;}
+                }
+            }
+            //eliminate by color
+            for(int j=0;j<225;j++){
+                int x=j%15;
+                int y=j/15;
+                if(info.field[j]<3||info.field[j]==8){
+                    possibleEnemyMap[enemyId-3][y][x]=0;
+                }
+            }
+            //eliminate by oldEnemy
+            if(oldEnemyPostionX[enemyId-3]!=-1&&oldEnemyPostionY[enemyId-3]!=-1){
+                for(int j=0;j<225;j++){
+                    int x=j%15;
+                    int y=j/15;
+                    int diffx=abs(x-oldEnemyPostionX[enemyId-3]);
+                    int diffy=abs(y-oldEnemyPostionY[enemyId-3]);
+                    if(diffx+diffy>1){  
+                        possibleEnemyMap[enemyId-3][y][x]=0;
+                    }
+                }
+            }
+            //confirm by emey pos map
+            int count=0,confirmX=0,confirmY=0;
+            for(int j=0;j<225;j++){
+                int x=j%15;
+                int y=j/15;
+                if(possibleEnemyMap[enemyId-3][y][x]>0){
+                    count++;confirmX=x;confirmY=y;
+                }
+            }
+            if(count==1){
+                info.samuraiInfo[enemyId].curX=confirmX;
+                info.samuraiInfo[enemyId].curY=confirmY;
+                ostringstream oss;
+                oss<<"#define enemy"<<enemyId<<" to "<<confirmX<<","<<confirmY<<" by enemyPostionEliminate";
+                printStr(playerIndex,TureTurnNum,oss.str().c_str());
+                //cerr<<playerIndex<<" "<<TureTurnNum<<" " << oss.str().c_str()<<std::endl; 
+            }
+        }
+        printMap(playerIndex,TureTurnNum,"enemy3estimate",possibleEnemyMap[0]);
+        printMap(playerIndex,TureTurnNum,"enemy4estimate",possibleEnemyMap[1]);
+        printMap(playerIndex,TureTurnNum,"enemy5estimate",possibleEnemyMap[2]);
+       
 
         //save old field for next
         for(int i=0;i<225;i++){
