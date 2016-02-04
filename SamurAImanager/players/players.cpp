@@ -171,22 +171,22 @@ void rotate(int direction, int x0, int y0, int& x, int& y) {
     }
 }
 
-void GameInfo::occupy(int direction) {
+void GameInfo::occupy(int action) {
     static const int size[3] = {4, 5, 7};
     static const int ox[3][7] = {
         {0, 0, 0, 0, 0, 0, 0},
         {0, 0, 1, 1, 2, 0, 0},
-        {-1,-1,-1,0, 1, 1, 1}};
+        {-1,-1,-1,0,1,1,1}};
     static const int oy[3][7] = {
         {1, 2, 3, 4},
         {1, 2, 0, 1, 0},
-        {-1,-1,1, 1, 1,-1, 0}}; 
-    SamuraiInfo& myself = samuraiInfo[weapon];
+        {-1,0,1,1,-1,0,1}};
     for (int k = 0; k != size[weapon]; k++) {
         int x, y;
-        rotate(direction, ox[weapon][k], oy[weapon][k], x, y);
-        x += myself.curX;
-        y += myself.curY;
+        SamuraiInfo& me = samuraiInfo[weapon];
+        rotate(action-1, ox[weapon][k], oy[weapon][k], x, y);
+        x += me.curX;
+        y += me.curY;
         if (0 <= x && x < width && 0 <= y && y < height) {
             field[y*width+x] = weapon;
             for (int s = 3; s != 6; s++) {

@@ -117,6 +117,31 @@ struct PlanningPlayer: Player {
             }
         }
     }
+    void memoryTurnEnd(GameInfo& info){
+        Undo undo;
+        int enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, doubleAction, center; 
+        for(int action: bestPlay){
+            if(action>0&&action<5){info.occupy(action);}
+            else info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, center,myTern, enemyMemory, myfield, doubleAction);
+        }
+        //print default infomations
+        for(int i=0;i<6;i++){
+            ostringstream oss;
+            oss<<"agent"<<i <<" "<<info.samuraiInfo[i].curX<<","<<info.samuraiInfo[i].curY;
+            printStr(info.weapon+3*info.side,info.turn,oss.str().c_str());
+        }
+        printMap2(info.weapon+3*info.side,info.turn,"realAfter",info.field);
+        //save old field for next
+        for(int i=0;i<225;i++){
+            oldMap[i] = info.field[i];
+        }
+        for(int id=3;id<6;id++){
+            oldEnemyPostionX[id-3]=info.samuraiInfo[id].curX;
+            oldEnemyPostionY[id-3]=info.samuraiInfo[id].curY;
+        }
+        oldTurnNum=info.turn;
+
+    }
     void play(GameInfo& info) {
         currentPlay.clear();
         updateMyField(info);
@@ -134,8 +159,10 @@ struct PlanningPlayer: Player {
         plan(info, info.samuraiInfo[info.weapon], 7, 0, myTern, enemyMemory, myfield);
         for (int action: bestPlay) {
             cout << action << ' ';
-        }        
+        }
+        memoryTurnEnd(info);
     }
+    
     void guessEnemyPostion(GameInfo& info){       
         int turnOrder[6][2]={{0,7},{3,8},{4,11},{1,6},{2,9},{5,10}};
         int TureTurnNum=info.turn;
@@ -367,16 +394,7 @@ struct PlanningPlayer: Player {
         printMap(playerIndex,TureTurnNum,"enemy5estimate",possibleEnemyMap[2]);
        
 
-        //save old field for next
-        for(int i=0;i<225;i++){
-            oldMap[i] = info.field[i];
-        }
-        for(int id=3;id<6;id++){
-            oldEnemyPostionX[id-3]=info.samuraiInfo[id].curX;
-            oldEnemyPostionY[id-3]=info.samuraiInfo[id].curY;
-        }
-        oldTurnNum=TureTurnNum;
-    
+            
     }
     void updateMyField(GameInfo& info){
         int tmpField[15][15] = {};
