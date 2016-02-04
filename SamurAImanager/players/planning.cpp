@@ -295,8 +295,30 @@ struct PlanningPlayer: Player {
         printMap(playerIndex,TureTurnNum,"enemy4possible by oldEnemyPos",possibleOccupyMap[1]);
         printMap(playerIndex,TureTurnNum,"enemy5possible by oldEnemyPos",possibleOccupyMap[2]);
        
-         
+        //eliminate by oldFieldInfo
+        for(int enemyId=3;enemyId<6;enemyId++){
+            for(int j=0;j<225;j++){
+                int x=j%15;
+                int y=j/15;
+                if(possibleOccupyMap[enemyId-3][y][x]>0){
+                    bool isAlone=true;
+                    int list[4][2]={{1,0},{0,1},{-1,0},{0,-1}};
+                    for(auto tmp:list){
+                        if(x+tmp[0]<0||x+tmp[0]>14||y+tmp[1]<0||y+tmp[1]>15)continue;
+                        int color=oldMap[(y+tmp[1])*15+x+tmp[0]];
+                        if(color==9||color==3||color==4||color==5){isAlone=false;break;}
+                    }
+                    if(isAlone){
+                        possibleOccupyMap[enemyId-3][y][x]=0;
+                    }
+                }
+            }   
+        }
 
+        printMap(playerIndex,TureTurnNum,"enemy3possible by oldField",possibleOccupyMap[0]);
+        printMap(playerIndex,TureTurnNum,"enemy4possible by oldField",possibleOccupyMap[1]);
+        printMap(playerIndex,TureTurnNum,"enemy5possible by oldField",possibleOccupyMap[2]);
+       
         //confirmEnemyPostion
         //confirm when you know where enemy was before turn and now the pospos is beside of before postion 
         for(int enemyId=3;enemyId<6;enemyId++){
