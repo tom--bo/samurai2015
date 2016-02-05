@@ -1,9 +1,0 @@
-# Samurai Database
-6
-"players/"
-"Masamune" "greedyPlayer0" "$1"
-"Kenshin" "greedyPlayer1" "$1"
-"Shingen" "greedyPlayer2" "$1"
-"Ujiyasu" "greedyPlayer0" "$1"
-"Nagamasa" "greedyPlayer1" "$1"
-"Yoshikage" "greedyPlayer2" "$1"
