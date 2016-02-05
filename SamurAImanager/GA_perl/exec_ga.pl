@@ -17,7 +17,7 @@ for(my $i=0; $i<10; $i++) {
     push @parents, &generate_gene();
 }
 my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
-my $log_file = "logs/p".$player."_".($mon+1)."m".$mday."d_".$hour."h".$min."m".$sec.".log";
+my $log_file = "../logs/p".$player."_".($mon+1)."m".$mday."d_".$hour."h".$min."m".$sec.".log";
 open(OUT, ">> $log_file") or die "$!";
 
 for(my $i=0; $i<200; $i++) {
@@ -28,21 +28,21 @@ for(my $i=0; $i<200; $i++) {
     @children = &GA::cross_parents(@parents);
     for (my $j=0; $j<$#children+1; $j++) {
         @merits = &gene_to_merits($children[$j]);
-        `echo $merits[0] > evolution/load.gen`;
+        `echo $merits[0] > ../evolution/load.gen`;
         for(my $k=1; $k<9; $k++) { 
-            `echo $merits[$k] >> evolution/load.gen`;
+            `echo $merits[$k] >> ../evolution/load.gen`;
         }
 
         if($player == 0) {
-            `manager/gameManager -a players/filePlayer -p "" -u "" -n "greedy0" -r 1 -s 100 -a players/greedyPlayer1 -p "" -u "" -n "greedy1" -r 2 -s 98 -a players/greedyPlayer2 -p "" -u "" -n "greedy2" -r 3 -s 70 -a players/greedyPlayer3 -p "" -u "" -n "greedy3" -r 3 -s 60 -a players/greedyPlayer4 -p "" -u "" -n "greedy4" -r 3 -s 50 -a players/greedyPlayer5 -p "" -u "" -n "greedy5" -r 3 -s 40 > result.txt`;
+            `../manager/gameManager -a players/filePlayer -p "" -u "" -n "greedy0" -r 1 -s 100 -a players/greedyPlayer1 -p "" -u "" -n "greedy1" -r 2 -s 98 -a players/greedyPlayer2 -p "" -u "" -n "greedy2" -r 3 -s 70 -a players/greedyPlayer3 -p "" -u "" -n "greedy3" -r 3 -s 60 -a players/greedyPlayer4 -p "" -u "" -n "greedy4" -r 3 -s 50 -a players/greedyPlayer5 -p "" -u "" -n "greedy5" -r 3 -s 40 > result.txt`;
         } elsif ($player == 1) {
-            `manager/gameManager -a players/greedyPlayer0 -p "" -u "" -n "greedy0" -r 1 -s 100 -a players/filePlayer -p "" -u "" -n "greedy1" -r 2 -s 98 -a players/greedyPlayer2 -p "" -u "" -n "greedy2" -r 3 -s 70 -a players/greedyPlayer3 -p "" -u "" -n "greedy3" -r 3 -s 60 -a players/greedyPlayer4 -p "" -u "" -n "greedy4" -r 3 -s 50 -a players/greedyPlayer5 -p "" -u "" -n "greedy5" -r 3 -s 40 > result.txt`;
+            `../manager/gameManager -a players/greedyPlayer0 -p "" -u "" -n "greedy0" -r 1 -s 100 -a players/filePlayer -p "" -u "" -n "greedy1" -r 2 -s 98 -a players/greedyPlayer2 -p "" -u "" -n "greedy2" -r 3 -s 70 -a players/greedyPlayer3 -p "" -u "" -n "greedy3" -r 3 -s 60 -a players/greedyPlayer4 -p "" -u "" -n "greedy4" -r 3 -s 50 -a players/greedyPlayer5 -p "" -u "" -n "greedy5" -r 3 -s 40 > result.txt`;
         } else {
-            `manager/gameManager -a players/greedyPlayer0 -p "" -u "" -n "greedy0" -r 1 -s 100 -a players/greedyPlayer1 -p "" -u "" -n "greedy1" -r 2 -s 98 -a players/filePlayer -p "" -u "" -n "greedy2" -r 3 -s 70 -a players/greedyPlayer3 -p "" -u "" -n "greedy3" -r 3 -s 60 -a players/greedyPlayer4 -p "" -u "" -n "greedy4" -r 3 -s 50 -a players/greedyPlayer5 -p "" -u "" -n "greedy5" -r 3 -s 40 > result.txt`;
+            `../manager/gameManager -a players/greedyPlayer0 -p "" -u "" -n "greedy0" -r 1 -s 100 -a players/greedyPlayer1 -p "" -u "" -n "greedy1" -r 2 -s 98 -a players/filePlayer -p "" -u "" -n "greedy2" -r 3 -s 70 -a players/greedyPlayer3 -p "" -u "" -n "greedy3" -r 3 -s 60 -a players/greedyPlayer4 -p "" -u "" -n "greedy4" -r 3 -s 50 -a players/greedyPlayer5 -p "" -u "" -n "greedy5" -r 3 -s 40 > result.txt`;
         }
 
         my $point;
-        open(IN, "result.txt");
+        open(IN, "../result.txt");
         while(<IN>) {
             if($_ =~ /\[(.*)\]/) {
                 my @scores = split(/,/, $1);
@@ -51,7 +51,7 @@ for(my $i=0; $i<200; $i++) {
             }
         }
         close(IN);
-        unlink("result.txt");
+        unlink("../result.txt");
 
         push @result_children, $children[$j];
         push @result_points, $point;
