@@ -314,11 +314,62 @@ struct PlanningPlayer: Player {
                 }
             }   
         }
-
         printMap(playerIndex,TureTurnNum,"enemy3possible by oldField",possibleOccupyMap[0]);
         printMap(playerIndex,TureTurnNum,"enemy4possible by oldField",possibleOccupyMap[1]);
         printMap(playerIndex,TureTurnNum,"enemy5possible by oldField",possibleOccupyMap[2]);
        
+        //eliminate by empty field around
+        const int size[3] = {4, 5, 7};
+        const int ox[3][7] = {
+            {0, 0, 0, 0, 0, 0, 0},
+            {0, 0, 1, 1, 2, 0, 0},
+            {-1,-1,-1,0,1,1,1}};
+        const int oy[3][7] = {
+            {1, 2, 3, 4},
+            {1, 2, 0, 1, 0},
+            {-1,0,1,1,-1,0,1}};
+        for(int enemyId=3;enemyId<6;enemyId++){
+            for(int j=0;j<225;j++){
+                int x=j%15;
+                int y=j/15;
+                if(possibleOccupyMap[enemyId-3][y][x]>0){
+                    bool noRealty=false;
+                    int weapon=enemyId%3;
+                    int actions[4]={1,2,3,4};
+                    for(int action: actions){
+                        int remainOccupied=possibleOccupyMap[enemyId-3][y][x];
+                        int countEnpty=0;
+                        for (int k = 0; k != size[weapon]; k++) {
+                            int diffx, diffy;
+                            rotate(action-1, ox[weapon][k], oy[weapon][k], diffx, diffy);
+                            diffx += x;
+                            diffy += y;
+                            if (0 <= diffx && diffx < 15 && 0 <= diffy && diffy < 15) {
+                                if(info.field[diffx+diffy*15]==8||info.field[diffx+diffy*15]==info.weapon){
+                                    countEnpty+=1;
+                                }
+                                if(diffField[diffx][diffy]==enemyId){
+                                    remainOccupied-=1;    
+                                }
+                            }
+                        }
+                        if(remainOccupied==0&&countEnpty>0){
+                            noRealty=true;
+                            break;
+                        }
+                    }
+                    if(noRealty){
+                        cerr<<"by empty!!!!!!!!!! at "<<TureTurnNum<<endl;
+                        possibleOccupyMap[enemyId-3][y][x]=0;
+                    }
+                } 
+            }
+        } 
+        printMap(playerIndex,TureTurnNum,"enemy3possible by emptyField",possibleOccupyMap[0]);
+        printMap(playerIndex,TureTurnNum,"enemy4possible by emptyField",possibleOccupyMap[1]);
+        printMap(playerIndex,TureTurnNum,"enemy5possible by emptyField",possibleOccupyMap[2]);
+        
+        
         //confirmEnemyPostion
         //confirm when you know where enemy was before turn and now the pospos is beside of before postion 
         for(int enemyId=3;enemyId<6;enemyId++){
