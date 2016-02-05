@@ -9,13 +9,13 @@ double centerMerits;
 double doubleMerits;
 
 void setMerits(int weaponid){
-    enemyTerritoryMerits  = 60;
-    blankTerritoryMerits  = 32;
-    friendTerritoryMerits = 32;
-    hurtingMerits         = 58;
-    hidingMerits          = 24;
-    avoidingMerits        =  1;
-    movingMerits          = 14;
-    centerMerits          = 63;
-    doubleMerits          = 55;
+    enemyTerritoryMerits  = 48;
+    blankTerritoryMerits  = 61;
+    friendTerritoryMerits = 23;
+    hurtingMerits         = 30;
+    hidingMerits          =  6;
+    avoidingMerits        = 38;
+    movingMerits          = 29;
+    centerMerits          = 33;
+    doubleMerits          = 26;
 }
