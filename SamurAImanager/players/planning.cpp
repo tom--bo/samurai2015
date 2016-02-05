@@ -124,7 +124,7 @@ struct PlanningPlayer: Player {
         int enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, doubleAction, center; 
         for(int action: bestPlay){
             if(action>0&&action<5){info.occupy(action);}
-            else info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, center,myTern, enemyMemory, myfield, doubleAction);
+            else info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, center, info.turn, enemyMemory, myfield, doubleAction);
         }
         //print default infomations
         for(int i=0;i<6;i++){
