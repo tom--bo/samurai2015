@@ -41,7 +41,7 @@ int oldTurnNum=-1;
 
 
 void printParam(int i){
-
+return;
 cerr<<"#player"<<i<<" "<<enemyTerritoryMerits<<" "<<blankTerritoryMerits<<" "<<friendTerritoryMerits<<" "<<hurtingMerits<<" "<<hidingMerits<<" "<<avoidingMerits<<" "<<movingMerits<<" "<<centerMerits<<" "<<doubleMerits<<endl;
 
 
@@ -56,6 +56,7 @@ struct PlanningPlayer: Player {
     
     }
     void printMap2(int pid,int turn,const char* title,int map[225]){
+        return;
         ostringstream oss;
         oss<<"mylog/log"<<pid<<"-turn"<<turn;
         std::ofstream ofs(oss.str(), std::ios::app );
@@ -69,6 +70,7 @@ struct PlanningPlayer: Player {
         }
     }
     void printMap(int pid,int turn,const char* title,int map[15][15]){
+        return;
         ostringstream oss;
         oss<<"mylog/log"<<pid<<"-turn"<<turn;
         std::ofstream ofs(oss.str(), std::ios::app );
@@ -81,6 +83,7 @@ struct PlanningPlayer: Player {
         }
     }
     void printStr(int pid,int turn ,const char* str){
+        return;
         ostringstream oss;
         oss<<"mylog/log"<<pid<<"-turn"<<turn;
         std::ofstream ofs(oss.str(), std::ios::app );
@@ -219,6 +222,7 @@ struct PlanningPlayer: Player {
                     {
                         SamuraiInfo& si=info.samuraiInfo[i];
                         if(si.curX==si.homeX&&si.curY==si.homeY)continue;//when enemy dead
+                        continue;
                         cerr<<"At turn"<<TureTurnNum <<" double action fill by old is Error!!!!"<<endl;
                         cerr<<"old: "<<oldEnemyPostionX[i-3]<<","<<oldEnemyPostionY[i-3]<<endl; 
                         cerr<<"now: "<<info.samuraiInfo[i].curX<<","<<info.samuraiInfo[i].curY<<endl;
@@ -359,7 +363,7 @@ struct PlanningPlayer: Player {
                         }
                     }
                     if(noRealty){
-                        cerr<<"by empty!!!!!!!!!! at "<<TureTurnNum<<endl;
+                        //cerr<<"by empty!!!!!!!!!! at "<<TureTurnNum<<endl;
                         possibleOccupyMap[enemyId-3][y][x]=0;
                     }
                 } 
@@ -393,7 +397,7 @@ struct PlanningPlayer: Player {
                         //if you can see enemy and not equaled to confirmXY, its error!!
                         if(si.curX!=confirmX||si.curY!=confirmY){
                             if(info.field[si.curX+si.curY*15]<3||info.field[si.curX+si.curY*15]==8)continue;
-                            cerr<<"postion conflict error!!!! when t="<<TureTurnNum<<" enemy="<<enemyId<<std::endl;
+                            //cerr<<"postion conflict error!!!! when t="<<TureTurnNum<<" enemy="<<enemyId<<std::endl;
                             printParam(playerIndex); 
                         }
                         continue;
