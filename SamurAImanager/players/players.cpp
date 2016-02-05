@@ -216,7 +216,7 @@ void Undo::apply() {
     for (SamuraiUndo& u: samuraiUndo) u.apply();
 }
 
-void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blankTerritory, int& friendTerritory, int& injury, int& hiding, int& avoiding, int& moving, int& center, int myTern, int enemyMemory[100], int myfield[2], int& doubleAction) {
+void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blankTerritory, int& friendTerritory, int& injury, int& hiding, int& avoiding, int& moving, int& center, int turn, int enemyMemory[100], int myfield[2], int& doubleAction) {
     SamuraiInfo& me = samuraiInfo[weapon];
     enemyTerritory = blankTerritory = friendTerritory = injury = hiding = avoiding = moving = center = doubleAction = 0;
     switch (action) {
@@ -289,28 +289,25 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
             moving += distance;
 
             bool preInEnemyTerritory = false, nowInEnemyTerritory = false;
-            // doubleActionの時(剣と斧のみ）
 
             int samuraiID = weapon+side*3;
-            if(samuraiID%2 == myTern%2) {
-                if(weapon%3 == 1) { // sword
-                    SamuraiInfo& si = samuraiInfo[4];
-                    if(si.curX!=-1 && si.curY!=-1 && si.curX != si.homeX && si.curY != si.homeY){
-                        preInEnemyTerritory = isEnemyTerritory(oldX, oldY, 4, samuraiInfo[4]);
-                        nowInEnemyTerritory = isEnemyTerritory(me.curX, me.curY, 4, samuraiInfo[4]);
-                    }
-                } else if(weapon%3 == 2) { //ax
-                    SamuraiInfo& si = samuraiInfo[5];
-                    if(si.curX!=-1 && si.curY!=-1 && si.curX != si.homeX && si.curY != si.homeY){
-                        preInEnemyTerritory = isEnemyTerritory(oldX, oldY, 5, samuraiInfo[5]);
-                        nowInEnemyTerritory = isEnemyTerritory(me.curX, me.curY, 5, samuraiInfo[5]);
-                    }
-                } else if(weapon%3 == 0) { // spir
-                    SamuraiInfo& si = samuraiInfo[3];
-                    if(si.curX!=-1 && si.curY!=-1 && si.curX != si.homeX && si.curY != si.homeY){
-                        preInEnemyTerritory = isEnemyTerritory(oldX, oldY, 3, samuraiInfo[3]);
-                        nowInEnemyTerritory = isEnemyTerritory(me.curX, me.curY, 3, samuraiInfo[3]);
-                    }
+            if(weapon%3 == 1 && ((turn%12 == 3) || (turn%12 == 9))) { // sword
+                SamuraiInfo& si = samuraiInfo[4];
+                if(si.curX!=-1 && si.curY!=-1 && si.curX != si.homeX && si.curY != si.homeY){
+                    preInEnemyTerritory = isEnemyTerritory(oldX, oldY, 4, samuraiInfo[4]);
+                    nowInEnemyTerritory = isEnemyTerritory(me.curX, me.curY, 4, samuraiInfo[4]);
+                }
+            } else if(weapon%3 == 2 && ((turn%12 == 5) || (turn%12 == 11))) { // ax 
+                SamuraiInfo& si = samuraiInfo[5];
+                if(si.curX!=-1 && si.curY!=-1 && si.curX != si.homeX && si.curY != si.homeY){
+                    preInEnemyTerritory = isEnemyTerritory(oldX, oldY, 5, samuraiInfo[5]);
+                    nowInEnemyTerritory = isEnemyTerritory(me.curX, me.curY, 5, samuraiInfo[5]);
+                }
+            } else if(weapon%3 == 0 && ((turn%12 == 1) || (turn%12 == 7))) { // spir
+                SamuraiInfo& si = samuraiInfo[3];
+                if(si.curX!=-1 && si.curY!=-1 && si.curX != si.homeX && si.curY != si.homeY){
+                    preInEnemyTerritory = isEnemyTerritory(oldX, oldY, 3, samuraiInfo[3]);
+                    nowInEnemyTerritory = isEnemyTerritory(me.curX, me.curY, 3, samuraiInfo[3]);
                 }
             }
             if(preInEnemyTerritory == false && nowInEnemyTerritory == true) {
@@ -323,10 +320,10 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
         case 9: // hide
             undo.recSamurai(&me);
             me.hidden = 1;
-            if(enemyMemory[myTern] >= 1) {
+            if(enemyMemory[turn/6] >= 1) {
                 hiding += 2;
             }
-            if(enemyMemory[myTern-1] >= 1) {
+            if(turn/6 > 0 && enemyMemory[turn/6-1] >= 1) {
                 hiding += 1;
             }
             hiding += 1;
@@ -334,10 +331,10 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
         case 10: // appear
             undo.recSamurai(&me);
             me.hidden = 0;
-            if(enemyMemory[myTern] >= 1) {
+            if(enemyMemory[turn/6] >= 1) {
                 hiding -= 2;
             }
-            if(enemyMemory[myTern-1] >= 1) {
+            if(turn/6 > 0 && enemyMemory[turn/6-1] >= 1) {
                 hiding -= 1;
             }
             hiding -= 1;
