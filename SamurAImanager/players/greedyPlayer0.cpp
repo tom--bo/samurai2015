@@ -18,7 +18,7 @@ void setMerits(int weaponid){
     hidingMerits          = 10;
     avoidingMerits        =100;
     movingMerits          =  5;
-    centerMerits          = 10;
+    centerMerits          = 30;
     doubleMerits          =200;
     dangerMerits          = 40;
     assassinMerits        =100;

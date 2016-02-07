@@ -12,13 +12,13 @@ double assassinMerits;
 
 void setMerits(int weaponid){
     enemyTerritoryMerits  = 60;
-    blankTerritoryMerits  = 40;
-    friendTerritoryMerits = 10;
+    blankTerritoryMerits  = 50;
+    friendTerritoryMerits = 20;
     hurtingMerits         =500;
     hidingMerits          = 10;
     avoidingMerits        =100;
     movingMerits          =  5;
-    centerMerits          = 10;
+    centerMerits          = 15;
     doubleMerits          =200;
     dangerMerits          = 40;
     assassinMerits        =100;
