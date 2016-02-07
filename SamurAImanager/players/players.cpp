@@ -373,7 +373,7 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
     for (int s = 3; s != 6; s++) {
         SamuraiInfo& si = samuraiInfo[s];
         if(si.curX==-1&&si.curY==-1)continue;
-        if((reborn[s-3]-turn) < 0 || (reborn[s-3]-turn)>6 ){
+        if( (reborn[s-3]-turn)>6) {
             continue;
         }
         int diffx=abs(me.curX-si.curX);

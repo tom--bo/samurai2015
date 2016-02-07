@@ -31,6 +31,7 @@ int oldEnemyPostionX[3]={};
 int oldEnemyPostionY[3]={};
 int oldTurnNum=-1;
 int dangerMap[15][15]={0};
+int antiAssassinMode=0;
 #define injuryMAX 1.0
 #define hidingMAX 2.0
 #define avoidingMAX 1.0
@@ -507,6 +508,29 @@ struct PlanningPlayer: Player {
         }
         printMap(playerIndex,TureTurnNum,"dangerMap",dangerMap);
 
+
+        //anti-Assassin
+        if(info.turn<30){
+            if(antiAssassinMode==0){
+                int tmp[4][2]={{2,2},{2,-2},{-2,2},{-2,-2}};
+                for(auto diff:tmp){
+                    int kx=info.samuraiInfo[playerIndex].curX+diff[0];
+                    int ky=info.samuraiInfo[playerIndex].curY+diff[1];
+                    if(kx<0||ky<0||kx>14||ky>14)continue;
+                    int color=info.field[ky*15+kx];
+                    if(color>=3&&color<=5){
+                       if(info.samuraiInfo[color].curX!=-1&&info.samuraiInfo[color].curY!=-1)continue;
+                       info.samuraiInfo[color].curX=kx;
+                       info.samuraiInfo[color].curY=ky;
+                       antiAssassinMode=1;
+                       cerr<<"antiAssas!!!!!!! turn:"<<info.turn<<" eid:"<<color<<" x:"<<kx<<" y:"<<ky<<endl;
+                    }
+                }
+            }else{
+                antiAssassinMode=0;
+            }
+        }
+                
             
     }
     void updateMyField(GameInfo& info){
