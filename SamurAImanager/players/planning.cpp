@@ -164,7 +164,7 @@ struct PlanningPlayer: Player {
                 enemyMemory[info.turn/6] += 1;
             }
         }
-        plan(info, info.samuraiInfo[info.weapon], 7, 0, enemyMemory, myfield);
+        plan(info, info.samuraiInfo[info.weapon], 7, -5000, enemyMemory, myfield);
         for (int action: bestPlay) {
             cout << action << ' ';
         }
