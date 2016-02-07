@@ -149,7 +149,7 @@ struct PlanningPlayer: Player {
         updateMyField(info);
         setMerits(info.weapon);
         guessEnemyPostion(info);
-        bestMerits = -1;
+        bestMerits = -5000;
         SamuraiInfo& me = info.samuraiInfo[info.weapon];
         for (int s = 3; s != 6; s++) {
             SamuraiInfo& si = info.samuraiInfo[s];
