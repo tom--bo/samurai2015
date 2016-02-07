@@ -95,12 +95,14 @@ struct PlanningPlayer: Player {
         } else if(info.weapon%3 == 2) {
             territoryMax = 7;
         }
-        if (merits > bestMerits) {
-            bestMerits = merits;
-            bestPlay = currentPlay;
-        } else if (merits == bestMerits) {
-            if((int)(merits*3) % 2 == 0) {
+        if(power!=7){
+            if (merits > bestMerits) {
+                bestMerits = merits;
                 bestPlay = currentPlay;
+            } else if (merits == bestMerits) {
+                if((int)(merits*3) % 2 == 0) {
+                    bestPlay = currentPlay;
+                }
             }
         }
         static const int required[] = {0, 4, 4, 4, 4, 2, 2, 2, 2, 1, 1}; 
@@ -164,7 +166,7 @@ struct PlanningPlayer: Player {
                 enemyMemory[info.turn/6] += 1;
             }
         }
-        plan(info, info.samuraiInfo[info.weapon], 7, -5000, enemyMemory, myfield);
+        plan(info, info.samuraiInfo[info.weapon], 7, 0, enemyMemory, myfield);
         for (int action: bestPlay) {
             cout << action << ' ';
         }
