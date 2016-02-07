@@ -361,7 +361,7 @@ struct PlanningPlayer: Player {
                                 if(info.field[diffx+diffy*15]==8||info.field[diffx+diffy*15]==info.weapon){
                                     countEnpty+=1;
                                 }
-                                if(diffField[diffx][diffy]==enemyId){
+                                if(diffField[diffy][diffx]==enemyId){
                                     remainOccupied-=1;    
                                 }
                             }
