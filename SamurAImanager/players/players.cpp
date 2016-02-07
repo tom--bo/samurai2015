@@ -1,7 +1,7 @@
 #include "players.hpp"
 #include <unistd.h>
 #include <cstdlib>
-#define DANGER_THRESHOLD 2.0
+#define DANGER_THRESHOLD 0.33
 
 bool logging = false;
 int reborn[3] = {0, 0, 0};
@@ -405,7 +405,7 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
         }
     }
     if(dangerMap[me.curY][me.curX]>0){
-        if(dangerMap[me.curY][me.curX]>max/DANGER_THRESHOLD){
+        if(dangerMap[me.curY][me.curX]>max*DANGER_THRESHOLD){
             danger--;
         }else if(me.hidden==0){
             danger--;
