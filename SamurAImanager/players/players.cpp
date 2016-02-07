@@ -373,6 +373,9 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
     for (int s = 3; s != 6; s++) {
         SamuraiInfo& si = samuraiInfo[s];
         if(si.curX==-1&&si.curY==-1)continue;
+        if((reborn[s-3]-turn) < 0 || (reborn[s-3]-turn)>6 ){
+            continue;
+        }
         int diffx=abs(me.curX-si.curX);
         int diffy=abs(me.curY-si.curY);
         //axe
@@ -391,6 +394,7 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
             isDanger=true;
         }
     }
+ 
     if(isDanger){
         avoiding--;
     }
@@ -427,7 +431,7 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
                     assassin++;
                 }
             }
-        }
+        } 
     }
 
     // add by position (closeness from center)
@@ -491,7 +495,7 @@ int main(int argc, char* argv[]) {
         if (info.curePeriod != 0) {
             cout << "0" << endl;
         } else {
-            player->play(info);
+            player->play(info, reborn);
             cout << "0\n";
         }
         if (logging) clog.flush();

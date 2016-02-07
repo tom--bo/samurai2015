@@ -74,7 +74,7 @@ struct GameInfo {
 };
 
 struct Player {
-    virtual void play(GameInfo& info) = 0;
+    virtual void play(GameInfo& info, int reborn[3]) = 0;
 };
 
 extern bool logging;

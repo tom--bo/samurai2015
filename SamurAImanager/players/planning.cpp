@@ -158,7 +158,7 @@ struct PlanningPlayer: Player {
         oldTurnNum=info.turn;
 
     }
-    void play(GameInfo& info) {
+    void play(GameInfo& info, int reborn[3]) {
         currentPlay.clear();
         updateMyField(info);
         setMerits(info.weapon);
@@ -167,7 +167,10 @@ struct PlanningPlayer: Player {
         SamuraiInfo& me = info.samuraiInfo[info.weapon];
         for (int s = 3; s != 6; s++) {
             SamuraiInfo& si = info.samuraiInfo[s];
-            if((si.curX != -1 && si.curY != -1 ) && abs(me.curX-si.curX)+abs(me.curY-si.curY)<=5){
+            if(reborn[s] > info.turn) {
+                enemyMemory[info.turn/6-1] -= 1;
+            }
+            if((si.curX != -1 && si.curY != -1 ) && abs(me.curX-si.curX)+abs(me.curY-si.curY)<=5 && si.curX!=si.homeX && si.curY!=si.homeY) {
                 enemyMemory[info.turn/6] += 1;
             }
         }

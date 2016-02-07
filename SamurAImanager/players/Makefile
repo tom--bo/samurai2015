@@ -2,11 +2,6 @@ CPPFLAGS= -std=c++11 -g
 CPP= c++
 
 COMMONOBJECTS= players.o
-RANDOMOBJECTS= ${COMMONOBJECTS} randomPlayer.o
-TIMEOUTOBJECTS=  ${COMMONOBJECTS} timeoutPlayer.o
-TOOACTIVEOBJECTS= ${COMMONOBJECTS} tooActivePlayer.o
-NONCHECKINGOBJECTS= ${COMMONOBJECTS} nonCheckingPlayer.o
-ABORTINGOBJECTS= ${COMMONOBJECTS} abortingPlayer.o
 PLANNINGOBJECTS= planning.o
 GREEDYOBJECTS= ${COMMONOBJECTS} ${PLANNINGOBJECTS} greedyPlayer.o
 GREEDYOBJECTS0= ${COMMONOBJECTS} ${PLANNINGOBJECTS} greedyPlayer0.o
@@ -17,24 +12,9 @@ GREEDYOBJECTS4= ${COMMONOBJECTS} ${PLANNINGOBJECTS} greedyPlayer4.o
 GREEDYOBJECTS5= ${COMMONOBJECTS} ${PLANNINGOBJECTS} greedyPlayer5.o
 FILEOBJECTS= ${COMMONOBJECTS} ${PLANNINGOBJECTS} filePlayer.o
  
-TARGET= randomPlayer greedyPlayer0  greedyPlayer1  greedyPlayer2 greedyPlayer3 greedyPlayer4 greedyPlayer5 greedyPlayer timeoutPlayer tooActivePlayer nonCheckingPlayer abortingPlayer filePlayer
+TARGET= greedyPlayer0  greedyPlayer1  greedyPlayer2 greedyPlayer3 greedyPlayer4 greedyPlayer5 greedyPlayer filePlayer
 
 all: ${TARGET}
-
-randomPlayer: ${RANDOMOBJECTS}
-	${CPP} ${CPPFLAGS} -o $@ $^
-
-timeoutPlayer: ${TIMEOUTOBJECTS}
-	${CPP} ${CPPFLAGS} -pthread -o $@ $^
-
-tooActivePlayer: ${TOOACTIVEOBJECTS}
-	${CPP} ${CPPFLAGS} -o $@ $^
-
-nonCheckingPlayer: ${NONCHECKINGOBJECTS}
-	${CPP} ${CPPFLAGS} -o $@ $^
-
-abortingPlayer: ${ABORTINGOBJECTS}
-	${CPP} ${CPPFLAGS} -o $@ $^
 
 greedyPlayer: ${GREEDYOBJECTS}
 	${CPP} ${CPPFLAGS} -o $@ $^
