@@ -1,6 +1,7 @@
 #include "players.hpp"
 #include <unistd.h>
 #include <cstdlib>
+#define DANGER_THRESHOLD 2.0
 
 bool logging = false;
 
@@ -393,10 +394,23 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
     }
 
     //dangerMap
-    if(dangerMap[me.curY][me.curX]>0&&me.hidden==0){
-        danger--;
+    int max=0;
+    for(int j=0;j<225;j++){
+        int x=j%15;
+        int y=j/15;
+        if(dangerMap[y][x]>max){
+            max=dangerMap[y][x];
+        }
+    }
+    if(dangerMap[me.curY][me.curX]>0){
+        if(dangerMap[me.curY][me.curX]>max/DANGER_THRESHOLD){
+            danger--;
+        }else if(me.hidden==0){
+            danger--;
+        }
     }
 
+    //assasin
     for(int s=3; s<=5; s++) {
         SamuraiInfo si = samuraiInfo[s];
         if(si.curX != -1 && si.curY != -1) {
