@@ -16,6 +16,7 @@ extern double movingMerits;
 extern double centerMerits;
 extern double doubleMerits;
 extern double dangerMerits;
+extern double assassinMerits;
 
 extern void setMerits(int weaponid);
 
@@ -37,6 +38,7 @@ int dangerMap[15][15]={0};
 #define doubleActionMAX 1.0
 #define centerMAX 10.0
 #define dangerMAX 1.0
+#define assassinMAX 1.0
 
 void printParam(int i){
 return;
@@ -111,8 +113,8 @@ struct PlanningPlayer: Player {
             if (required[action] <= power && info.isValidAt(action, me.curX, me.curY, me.hidden)) {
                 currentPlay.push_back(action);
                 Undo undo;
-                int enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, doubleAction, center, danger;
-                info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, center, info.turn, enemyMemory, myfield, doubleAction, dangerMap, danger);
+                int enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, doubleAction, center, danger, assassin;
+                info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, center, info.turn, enemyMemory, myfield, doubleAction, dangerMap, danger, assassin);
                 double gain = enemyTerritoryMerits*enemyTerritory/territoryMax
                     + blankTerritoryMerits*blankTerritory/territoryMax
                     + friendTerritoryMerits*friendTerritory/territoryMax
@@ -123,7 +125,8 @@ struct PlanningPlayer: Player {
                 double board =
                     + centerMerits*center/centerMAX
                     + avoidingMerits*avoiding/avoidingMAX
-                    + dangerMerits*danger/dangerMAX;
+                    + dangerMerits*danger/dangerMAX
+                    + assassinMerits*assassin/assassinMAX;
                 plan(info, me, power-required[action], merits+gain, board, enemyMemory, myfield);
                 undo.apply();
                 currentPlay.pop_back();
@@ -132,10 +135,10 @@ struct PlanningPlayer: Player {
     }
     void memoryTurnEnd(GameInfo& info){
         Undo undo;
-        int enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, doubleAction, center, danger; 
+        int enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, doubleAction, center, danger, assassin; 
         for(int action: bestPlay){
             if(action>0&&action<5){info.occupy(action);}
-            else info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, center, info.turn, enemyMemory, myfield, doubleAction, dangerMap, danger);
+            else info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, center, info.turn, enemyMemory, myfield, doubleAction, dangerMap, danger, assassin);
         }
         //print default infomations
         for(int i=0;i<6;i++){
