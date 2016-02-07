@@ -10,6 +10,7 @@ double avoidingMerits;
 double movingMerits;
 double centerMerits;
 double doubleMerits;
+double dangerMerits;
 
 
 double getIntFromFS(std::ifstream& ifs){
@@ -33,5 +34,5 @@ void setMerits(int weaponid){
     movingMerits = getIntFromFS(ifs);
     centerMerits = getIntFromFS(ifs);
     doubleMerits = getIntFromFS(ifs);
-    
+    dangerMerits = getIntFromFS(ifs);
 }
