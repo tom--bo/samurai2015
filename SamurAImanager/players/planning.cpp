@@ -86,7 +86,7 @@ struct PlanningPlayer: Player {
         std::ofstream ofs(oss.str(), std::ios::app );
         ofs<<"#"<<str<<std::endl;
     }
-    void plan(GameInfo& info, SamuraiInfo& me, int power, double merits, int enemyMemory[100], int myfleld[2]) {
+    void plan(GameInfo& info, SamuraiInfo& me, int power, double merits, double board, int enemyMemory[100], int myfleld[2]) {
         double territoryMax = 0;
         if(info.weapon%3 == 0) {
             territoryMax = 4;
@@ -96,11 +96,12 @@ struct PlanningPlayer: Player {
             territoryMax = 7;
         }
         if(power!=7){
-            if (merits > bestMerits) {
-                bestMerits = merits;
+            int score=merits+board;
+            if (score > bestMerits) {
+                bestMerits = score;
                 bestPlay = currentPlay;
-            } else if (merits == bestMerits) {
-                if((int)(merits*3) % 2 == 0) {
+            } else if (score == bestMerits) {
+                if((int)(score*3) % 2 == 0) {
                     bestPlay = currentPlay;
                 }
             }
@@ -117,12 +118,13 @@ struct PlanningPlayer: Player {
                     + friendTerritoryMerits*friendTerritory/territoryMax
                     + hurtingMerits*injury/injuryMAX
                     + hidingMerits*hiding/hidingMAX
-                    + avoidingMerits*avoiding/avoidingMAX
                     + movingMerits*moving/movingMAX
-                    + doubleMerits*doubleAction/doubleActionMAX
+                    + doubleMerits*doubleAction/doubleActionMAX;
+                double board =
                     + centerMerits*center/centerMAX
+                    + avoidingMerits*avoiding/avoidingMAX
                     + dangerMerits*danger/dangerMAX;
-                plan(info, me, power-required[action], merits+gain, enemyMemory, myfield);
+                plan(info, me, power-required[action], merits+gain, board, enemyMemory, myfield);
                 undo.apply();
                 currentPlay.pop_back();
             }
@@ -166,7 +168,7 @@ struct PlanningPlayer: Player {
                 enemyMemory[info.turn/6] += 1;
             }
         }
-        plan(info, info.samuraiInfo[info.weapon], 7, 0, enemyMemory, myfield);
+        plan(info, info.samuraiInfo[info.weapon], 7, 0, 0, enemyMemory, myfield);
         for (int action: bestPlay) {
             cout << action << ' ';
         }
