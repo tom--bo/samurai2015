@@ -3,6 +3,7 @@
 #include <cstdlib>
 
 bool logging = false;
+int reborn[3] = {0, 0, 0};
 
 CommentedIStream::CommentedIStream(istream &is):
 is(&is) {
@@ -195,6 +196,7 @@ void GameInfo::occupy(int action) {
                     si.curX = si.homeX;
                     si.curY = si.homeY;
                     si.hidden = 0;
+                    reborn[s] = turn+cureTurns;
                 }
             }
         }
@@ -400,8 +402,17 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
     for(int s=3; s<=5; s++) {
         SamuraiInfo si = samuraiInfo[s];
         if(si.curX != -1 && si.curY != -1) {
-            if(abs(me.curX - si.curX) == 2 && abs(me.curY - si.curY) == 2 && me.hidden == 1) {
-                assassin++;
+            if(si.curX == si.homeX && si.curY == si.homeY) {
+                // 次回動き出すのであれば
+                if((reborn[s]-turn) >= 0 && (reborn[s]-turn)<=6 ){
+                    if(abs(me.curX - si.curX) == 2 && abs(me.curY - si.curY) == 2 && me.hidden == 1) {
+                        assassin++;
+                    }
+                }
+            }else{
+                if(abs(me.curX - si.curX) == 2 && abs(me.curY - si.curY) == 2 && me.hidden == 1) {
+                    assassin++;
+                }
             }
         }
     }
