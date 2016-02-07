@@ -218,7 +218,7 @@ void Undo::apply() {
 
 void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blankTerritory, int& friendTerritory, int& injury, int& hiding, int& avoiding, int& moving, int& center, int turn, int enemyMemory[100], int myfield[2], int& doubleAction, int dangerMap[15][15], int& danger) {
     SamuraiInfo& me = samuraiInfo[weapon];
-    enemyTerritory = blankTerritory = friendTerritory = injury = hiding = avoiding = moving = center = doubleAction = 0;
+    enemyTerritory = blankTerritory = friendTerritory = injury = hiding = avoiding = moving = center = doubleAction = danger = 0;
     switch (action) {
         case 1: case 2: case 3: case 4: { // occupation
             static const int aroundHomePoint = 3;

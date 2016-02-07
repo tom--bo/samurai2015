@@ -474,7 +474,12 @@ struct PlanningPlayer: Player {
         printMap(playerIndex,TureTurnNum,"enemy3estimate",possibleEnemyMap[0]);
         printMap(playerIndex,TureTurnNum,"enemy4estimate",possibleEnemyMap[1]);
         printMap(playerIndex,TureTurnNum,"enemy5estimate",possibleEnemyMap[2]);
-      
+       for(int j=0;j<225;j++){
+            int x=j%15;
+            int y=j/15;
+            dangerMap[y][x]=0;
+       }
+
         for(int eid=0;eid<3;eid++){
              for(int j=0;j<225;j++){
                 int x=j%15;
