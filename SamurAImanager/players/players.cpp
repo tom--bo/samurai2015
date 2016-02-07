@@ -221,6 +221,7 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
     enemyTerritory = blankTerritory = friendTerritory = injury = hiding = avoiding = moving = center = doubleAction = 0;
     switch (action) {
         case 1: case 2: case 3: case 4: { // occupation
+            static const int aroundHomePoint = 3;
             static const int size[3] = {4, 5, 7};
             static const int ox[3][7] = {
                 {0, 0, 0, 0, 0, 0, 0},
@@ -231,11 +232,12 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
                 {1, 2, 0, 1, 0},
                 {-1,0,1,1,-1,0,1}};
             for (int k = 0; k != size[weapon]; k++) {
-                int x, y;
+                int x, y, distanceFromHome = 0;
                 rotate(action-1, ox[weapon][k], oy[weapon][k], x, y);
                 x += me.curX; y += me.curY;
                 if (0 <= x && x < width && 0 <= y && y < height) {
                     bool isHome = false;
+                    distanceFromHome = abs(me.homeX-x) + abs(me.homeY-y);
                     for (int s = 0; s != 6; s++) {
                         SamuraiInfo& si = samuraiInfo[s];
                         if (si.homeX == x && si.homeY == y) {
@@ -250,10 +252,31 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
                         if (current != weapon) {
                             if (current >= 8) { // unoccupied
                                 blankTerritory++;
+                                if(distanceFromHome == 1) {
+                                    blankTerritory+=3;
+                                } else if(distanceFromHome == 2) {
+                                    blankTerritory+=2;
+                                } else if(distanceFromHome == 3) {
+                                    blankTerritory+=1;
+                                }
                             } else if (current < 3) { // friends' territory
                                 friendTerritory++;
+                                if(distanceFromHome == 1) {
+                                    friendTerritory+=3;
+                                } else if(distanceFromHome == 2) {
+                                    friendTerritory+=2;
+                                } else if(distanceFromHome == 3) {
+                                    friendTerritory+=1;
+                                }
                             } else if (current >= 3) { // opponents' territory
                                 enemyTerritory++;
+                                if(distanceFromHome == 1) {
+                                    enemyTerritory+=3;
+                                } else if(distanceFromHome == 2) {
+                                    enemyTerritory+=2;
+                                } else if(distanceFromHome == 3) {
+                                    enemyTerritory+=1;
+                                }
                             }
                             undo.recField(&field[pos]);
                         }
