@@ -394,7 +394,7 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
 
 
     //dangerMap
-    if(dangerMap[me.curY][me.curX]>0){
+    if(dangerMap[me.curY][me.curX]>0&&me.hidden==0){
         danger--;
     }
 
