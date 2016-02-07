@@ -15,6 +15,7 @@ extern double avoidingMerits;
 extern double movingMerits;
 extern double centerMerits;
 extern double doubleMerits;
+extern double dangerMerits;
 
 extern void setMerits(int weaponid);
 
@@ -28,13 +29,14 @@ int oldMap[225];
 int oldEnemyPostionX[3]={};
 int oldEnemyPostionY[3]={};
 int oldTurnNum=-1;
+int dangerMap[15][15]={0};
 #define injuryMAX 1.0
 #define hidingMAX 2.0
 #define avoidingMAX 1.0
 #define movingMAX 1.0
 #define doubleActionMAX 1.0
 #define centerMAX 10.0
-
+#define dangerMAX 1.0
 
 void printParam(int i){
 return;
@@ -66,7 +68,6 @@ struct PlanningPlayer: Player {
         }
     }
     void printMap(int pid,int turn,const char* title,int map[15][15]){
-        return;
         ostringstream oss;
         oss<<"mylog/log"<<pid<<"-turn"<<turn;
         std::ofstream ofs(oss.str(), std::ios::app );
@@ -107,8 +108,8 @@ struct PlanningPlayer: Player {
             if (required[action] <= power && info.isValidAt(action, me.curX, me.curY, me.hidden)) {
                 currentPlay.push_back(action);
                 Undo undo;
-                int enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, doubleAction, center;
-                info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, center, info.turn, enemyMemory, myfield, doubleAction);
+                int enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, doubleAction, center, danger;
+                info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, center, info.turn, enemyMemory, myfield, doubleAction, dangerMap, danger);
                 double gain = enemyTerritoryMerits*enemyTerritory/territoryMax
                     + blankTerritoryMerits*blankTerritory/territoryMax
                     + friendTerritoryMerits*friendTerritory/territoryMax
@@ -117,7 +118,8 @@ struct PlanningPlayer: Player {
                     + avoidingMerits*avoiding/avoidingMAX
                     + movingMerits*moving/movingMAX
                     + doubleMerits*doubleAction/doubleActionMAX
-                    + centerMerits*center/centerMAX;
+                    + centerMerits*center/centerMAX
+                    + dangerMerits*danger/dangerMAX;
                 plan(info, me, power-required[action], merits+gain, enemyMemory, myfield);
                 undo.apply();
                 currentPlay.pop_back();
@@ -126,10 +128,10 @@ struct PlanningPlayer: Player {
     }
     void memoryTurnEnd(GameInfo& info){
         Undo undo;
-        int enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, doubleAction, center; 
+        int enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, doubleAction, center, danger; 
         for(int action: bestPlay){
             if(action>0&&action<5){info.occupy(action);}
-            else info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, center, info.turn, enemyMemory, myfield, doubleAction);
+            else info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, center, info.turn, enemyMemory, myfield, doubleAction, dangerMap, danger);
         }
         //print default infomations
         for(int i=0;i<6;i++){
@@ -472,7 +474,23 @@ struct PlanningPlayer: Player {
         printMap(playerIndex,TureTurnNum,"enemy3estimate",possibleEnemyMap[0]);
         printMap(playerIndex,TureTurnNum,"enemy4estimate",possibleEnemyMap[1]);
         printMap(playerIndex,TureTurnNum,"enemy5estimate",possibleEnemyMap[2]);
-       
+      
+        for(int eid=0;eid<3;eid++){
+             for(int j=0;j<225;j++){
+                int x=j%15;
+                int y=j/15;
+                if(possibleEnemyMap[eid][y][x]>0){
+                    for(int k=0;k<225;k++){
+                        int kx=k%15;
+                        int ky=k/15;
+                        if(info.isEnemyTerritory(kx,ky,eid+3,x,y)){
+                            dangerMap[ky][kx]+=1; 
+                        }
+                    }
+                }
+            } 
+        }
+        printMap(playerIndex,TureTurnNum,"dangerMap",dangerMap);
 
             
     }

@@ -7,6 +7,7 @@ double avoidingMerits;
 double movingMerits;
 double centerMerits;
 double doubleMerits;
+double dangerMerits;
 
 void setMerits(int weaponid){
     enemyTerritoryMerits  = 60;
@@ -18,6 +19,8 @@ void setMerits(int weaponid){
     movingMerits          =  5;
     centerMerits          = 10;
     doubleMerits          =200;
+    dangerMerits          = 40;
 }
+
 
 

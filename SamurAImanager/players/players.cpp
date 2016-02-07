@@ -216,7 +216,7 @@ void Undo::apply() {
     for (SamuraiUndo& u: samuraiUndo) u.apply();
 }
 
-void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blankTerritory, int& friendTerritory, int& injury, int& hiding, int& avoiding, int& moving, int& center, int turn, int enemyMemory[100], int myfield[2], int& doubleAction) {
+void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blankTerritory, int& friendTerritory, int& injury, int& hiding, int& avoiding, int& moving, int& center, int turn, int enemyMemory[100], int myfield[2], int& doubleAction, int dangerMap[15][15], int& danger) {
     SamuraiInfo& me = samuraiInfo[weapon];
     enemyTerritory = blankTerritory = friendTerritory = injury = hiding = avoiding = moving = center = doubleAction = 0;
     switch (action) {
@@ -317,20 +317,20 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
             if(weapon%3 == 1 && ((turn%12 == 3) || (turn%12 == 9))) { // sword
                 SamuraiInfo& si = samuraiInfo[4];
                 if(si.curX!=-1 && si.curY!=-1 && si.curX != si.homeX && si.curY != si.homeY){
-                    preInEnemyTerritory = isEnemyTerritory(oldX, oldY, 4, samuraiInfo[4]);
-                    nowInEnemyTerritory = isEnemyTerritory(me.curX, me.curY, 4, samuraiInfo[4]);
+                    preInEnemyTerritory = isEnemyTerritory(oldX, oldY, 4, samuraiInfo[4].curX, samuraiInfo[4].curY);
+                    nowInEnemyTerritory = isEnemyTerritory(me.curX, me.curY, 4, samuraiInfo[4].curX, samuraiInfo[4].curY);
                 }
             } else if(weapon%3 == 2 && ((turn%12 == 5) || (turn%12 == 11))) { // ax 
                 SamuraiInfo& si = samuraiInfo[5];
                 if(si.curX!=-1 && si.curY!=-1 && si.curX != si.homeX && si.curY != si.homeY){
-                    preInEnemyTerritory = isEnemyTerritory(oldX, oldY, 5, samuraiInfo[5]);
-                    nowInEnemyTerritory = isEnemyTerritory(me.curX, me.curY, 5, samuraiInfo[5]);
+                    preInEnemyTerritory = isEnemyTerritory(oldX, oldY, 5, samuraiInfo[5].curX, samuraiInfo[5].curY);
+                    nowInEnemyTerritory = isEnemyTerritory(me.curX, me.curY, 5, samuraiInfo[5].curX, samuraiInfo[5].curY);
                 }
             } else if(weapon%3 == 0 && ((turn%12 == 1) || (turn%12 == 7))) { // spir
                 SamuraiInfo& si = samuraiInfo[3];
                 if(si.curX!=-1 && si.curY!=-1 && si.curX != si.homeX && si.curY != si.homeY){
-                    preInEnemyTerritory = isEnemyTerritory(oldX, oldY, 3, samuraiInfo[3]);
-                    nowInEnemyTerritory = isEnemyTerritory(me.curX, me.curY, 3, samuraiInfo[3]);
+                    preInEnemyTerritory = isEnemyTerritory(oldX, oldY, 3, samuraiInfo[3].curX, samuraiInfo[3].curY);
+                    nowInEnemyTerritory = isEnemyTerritory(me.curX, me.curY, 3, samuraiInfo[3].curX, samuraiInfo[3].curY);
                 }
             }
             if(preInEnemyTerritory == false && nowInEnemyTerritory == true) {
@@ -392,6 +392,12 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
         avoiding--;
     }
 
+
+    //dangerMap
+    if(dangerMap[me.curY][me.curX]>0){
+        danger--;
+    }
+
     // add by position (closeness from center)
     int diffCenter = abs(me.curX - 7) + abs(me.curY - 7);
     switch(diffCenter) {
@@ -412,9 +418,9 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
         case 14: center+0 ; break;
     }
 }
-bool GameInfo::isEnemyTerritory(int meX, int meY, int enemyID, SamuraiInfo& si) {
-    int diffx=abs(meX-si.curX);
-    int diffy=abs(meY-si.curY);
+bool GameInfo::isEnemyTerritory(int meX, int meY, int enemyID, int enemyX, int enemyY) {
+    int diffx=abs(meX-enemyX);
+    int diffy=abs(meY-enemyY);
     if(enemyID==4 && diffx+diffy<=3){
         return true;
     }
@@ -432,10 +438,11 @@ bool GameInfo::isEnemyTerritory(int meX, int meY, int enemyID, SamuraiInfo& si) 
 
 void GameInfo::doAction(int action) {
     Undo dummy;
-    int dummy0, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8, dummy11;
+    int dummy0, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8, dummy11, dummy13;
     int dummy9[100] = {};
     int dummy10[2] = {};
-    tryAction(action, dummy, dummy0, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8, dummy9, dummy10, dummy11);
+    int dummy12[15][15]={};
+    tryAction(action, dummy, dummy0, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8, dummy9, dummy10, dummy11, dummy12, dummy13);
     cout << action << ' ';
 }
 
