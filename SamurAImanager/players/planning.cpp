@@ -28,11 +28,8 @@ int oldMap[225];
 int oldEnemyPostionX[3]={};
 int oldEnemyPostionY[3]={};
 int oldTurnNum=-1;
-#define enemyTerritoryMAX 5.0
-#define blankTerritoryMAX 5.0
-#define friendTerritoryMAX 5.0
 #define injuryMAX 1.0
-#define hidingMAX 1.0
+#define hidingMAX 2.0
 #define avoidingMAX 1.0
 #define movingMAX 1.0
 #define doubleActionMAX 1.0
@@ -89,6 +86,14 @@ struct PlanningPlayer: Player {
         ofs<<"#"<<str<<std::endl;
     }
     void plan(GameInfo& info, SamuraiInfo& me, int power, double merits, int enemyMemory[100], int myfleld[2]) {
+        double territoryMax = 0;
+        if(info.weapon%3 == 0) {
+            territoryMax = 4;
+        } else if(info.weapon%3 == 1) {
+            territoryMax = 5;
+        } else if(info.weapon%3 == 2) {
+            territoryMax = 7;
+        }
         if (merits > bestMerits) {
             bestMerits = merits;
             bestPlay = currentPlay;
@@ -104,9 +109,9 @@ struct PlanningPlayer: Player {
                 Undo undo;
                 int enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, doubleAction, center;
                 info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, center, info.turn, enemyMemory, myfield, doubleAction);
-                double gain = enemyTerritoryMerits*enemyTerritory/enemyTerritoryMAX
-                    + blankTerritoryMerits*blankTerritory/blankTerritoryMAX
-                    + friendTerritoryMerits*friendTerritory/friendTerritoryMAX
+                double gain = enemyTerritoryMerits*enemyTerritory/territoryMax
+                    + blankTerritoryMerits*blankTerritory/territoryMax
+                    + friendTerritoryMerits*friendTerritory/territoryMax
                     + hurtingMerits*injury/injuryMAX
                     + hidingMerits*hiding/hidingMAX
                     + avoidingMerits*avoiding/avoidingMAX
