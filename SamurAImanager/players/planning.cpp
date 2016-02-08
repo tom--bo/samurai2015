@@ -72,6 +72,7 @@ struct PlanningPlayer: Player {
         }
     }
     void printMap(int pid,int turn,const char* title,int map[15][15]){
+        return;
         ostringstream oss;
         oss<<"mylog/log"<<pid<<"-turn"<<turn;
         std::ofstream ofs(oss.str(), std::ios::app );
@@ -209,7 +210,7 @@ struct PlanningPlayer: Player {
             if(aroundAreaCnt<=1){
                 return false;
             }
-            cerr<<"resporn Kill Caution!!!!! at"<<info.turn<<" for player"<<info.weapon+info.side*3<<endl;
+            //cerr<<"resporn Kill Caution!!!!! at"<<info.turn<<" for player"<<info.weapon+info.side*3<<endl;
             return true;
         
         }
@@ -557,7 +558,7 @@ struct PlanningPlayer: Player {
                        info.samuraiInfo[color].curX=kx;
                        info.samuraiInfo[color].curY=ky;
                        antiAssassinMode=1;
-                       cerr<<"antiAssas!!!!!!! turn:"<<info.turn<<" eid:"<<color<<" x:"<<kx<<" y:"<<ky<<endl;
+                       //cerr<<"antiAssas!!!!!!! turn:"<<info.turn<<" eid:"<<color<<" x:"<<kx<<" y:"<<ky<<endl;
                     }
                 }
             }else{
