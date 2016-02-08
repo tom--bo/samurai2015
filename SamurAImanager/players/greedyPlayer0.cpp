@@ -9,6 +9,7 @@ double centerMerits;
 double doubleMerits;
 double dangerMerits;
 double assassinMerits;
+double respawnMerits;
 
 void setMerits(int weaponid){
     switch(weaponid%3) {
@@ -24,6 +25,7 @@ void setMerits(int weaponid){
             doubleMerits          =  400;
             dangerMerits          =   40;
             assassinMerits        =  100;
+            respawnMerits         =   60;
             break;
         case 1:
             enemyTerritoryMerits  =   60;
@@ -37,6 +39,7 @@ void setMerits(int weaponid){
             doubleMerits          =  400;
             dangerMerits          =   40;
             assassinMerits        =  100;
+            respawnMerits         =   60;
             break;
         case 2:
             enemyTerritoryMerits  =   60;
@@ -50,6 +53,7 @@ void setMerits(int weaponid){
             doubleMerits          =  400;
             dangerMerits          =   40;
             assassinMerits        =  100;
+            respawnMerits         =   60;
             break;
     }
 }
