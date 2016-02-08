@@ -17,7 +17,7 @@ void setMerits(int weaponid){
             blankTerritoryMerits  = 40;
             friendTerritoryMerits = 10;
             hurtingMerits         =500;
-            hidingMerits          = 10;
+            hidingMerits          = 30;
             avoidingMerits        =130;
             movingMerits          =  5;
             centerMerits          = 50;
@@ -30,10 +30,10 @@ void setMerits(int weaponid){
             blankTerritoryMerits  = 50;
             friendTerritoryMerits = 20;
             hurtingMerits         =500;
-            hidingMerits          = 10;
+            hidingMerits          = 30;
             avoidingMerits        =130;
             movingMerits          =  5;
-            centerMerits          = 15;
+            centerMerits          =  5;
             doubleMerits          =400;
             dangerMerits          = 40;
             assassinMerits        =100;
@@ -43,7 +43,7 @@ void setMerits(int weaponid){
             blankTerritoryMerits  = 50;
             friendTerritoryMerits = 10;
             hurtingMerits         =500;
-            hidingMerits          = 10;
+            hidingMerits          = 30;
             avoidingMerits        =130;
             movingMerits          =  5;
             centerMerits          =  5;

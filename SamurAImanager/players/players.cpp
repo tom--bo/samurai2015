@@ -219,6 +219,45 @@ void Undo::apply() {
     for (SamuraiUndo& u: samuraiUndo) u.apply();
 }
 
+int GameInfo::getPointAroundHome(int x, int y) {
+    SamuraiInfo& me = samuraiInfo[weapon];
+    int distanceFromHome = abs(me.homeX-x) + abs(me.homeY-y);
+    int pointMap0[4][4] = {
+        {0,2,2,1},
+        {2,1,0,0},
+        {2,1,0,0},
+        {1,1,0,0}
+    };
+    int pointMap1[5][5] = {
+        {0,2,2,2,2},
+        {2,1,1,1,0},
+        {2,1,1,0,0},
+        {2,1,0,0,0},
+        {2,0,0,0,0}
+    };
+    int pointMap2[4][4] = {
+        {0,2,2,0},
+        {2,2,2,0},
+        {2,2,2,0},
+        {2,2,2,0}
+    };
+
+    if(weapon%3 == 0) {
+        if(abs(me.homeX-x) <= 3 && abs(me.homeY-y) <= 3) {
+            return pointMap0[abs(me.homeY-y)][abs(me.homeX-x)];
+        }
+    }else if(weapon%3 == 1) {
+        if(abs(me.homeX-x) <= 4 && abs(me.homeY-y) <= 4) {
+            return pointMap1[abs(me.homeY-y)][abs(me.homeX-x)];
+        }
+    }else if(weapon%3 == 2) {
+        if(abs(me.homeX-x) <= 3 && abs(me.homeY-y) <= 3) {
+            return pointMap2[abs(me.homeY-y)][abs(me.homeX-x)];
+        }
+    }
+    return 0;
+}
+
 void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blankTerritory, int& friendTerritory, int& injury, int& hiding, int& avoiding, int& moving, int& center, int turn, int enemyMemory[100], int myfield[2], int& doubleAction, int dangerMap[15][15], int& danger, int& assassin) {
     SamuraiInfo& me = samuraiInfo[weapon];
     enemyTerritory = blankTerritory = friendTerritory = injury = hiding = avoiding = moving = assassin = center = doubleAction = danger = 0;
@@ -240,7 +279,6 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
                 x += me.curX; y += me.curY;
                 if (0 <= x && x < width && 0 <= y && y < height) {
                     bool isHome = false;
-                    distanceFromHome = abs(me.homeX-x) + abs(me.homeY-y);
                     for (int s = 0; s != 6; s++) {
                         SamuraiInfo& si = samuraiInfo[s];
                         if (si.homeX == x && si.homeY == y) {
@@ -255,31 +293,13 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
                         if (current != weapon) {
                             if (current >= 8) { // unoccupied
                                 blankTerritory++;
-                                if(distanceFromHome == 1) {
-                                    blankTerritory+=3;
-                                } else if(distanceFromHome == 2) {
-                                    blankTerritory+=2;
-                                } else if(distanceFromHome == 3) {
-                                    blankTerritory+=1;
-                                }
+                                blankTerritory += getPointAroundHome(x, y);
                             } else if (current < 3) { // friends' territory
                                 friendTerritory++;
-                                if(distanceFromHome == 1) {
-                                    friendTerritory+=3;
-                                } else if(distanceFromHome == 2) {
-                                    friendTerritory+=2;
-                                } else if(distanceFromHome == 3) {
-                                    friendTerritory+=1;
-                                }
+                                friendTerritory += getPointAroundHome(x, y);
                             } else if (current >= 3) { // opponents' territory
                                 enemyTerritory++;
-                                if(distanceFromHome == 1) {
-                                    enemyTerritory+=3;
-                                } else if(distanceFromHome == 2) {
-                                    enemyTerritory+=2;
-                                } else if(distanceFromHome == 3) {
-                                    enemyTerritory+=1;
-                                }
+                                enemyTerritory += getPointAroundHome(x, y);
                             }
                             undo.recField(&field[pos]);
                         }
