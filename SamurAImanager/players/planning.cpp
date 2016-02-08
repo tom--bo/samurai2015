@@ -32,6 +32,7 @@ int oldEnemyPostionY[3]={};
 int oldTurnNum=-1;
 int dangerMap[15][15]={0};
 int antiAssassinMode=0;
+int assassinCount=0;
 bool isBeRespawnKill=false;
 #define injuryMAX 1.0
 #define hidingMAX 2.0
@@ -126,6 +127,9 @@ struct PlanningPlayer: Player {
                     friendTerritoryMerits = 2000;
                     blankTerritoryMerits  = 1000;
                 }
+                if(assassinCount>=2){
+                    assassin=0;
+                }
                 double gain = enemyTerritoryMerits*enemyTerritory/territoryMax
                     + blankTerritoryMerits*blankTerritory/territoryMax
                     + friendTerritoryMerits*friendTerritory/territoryMax
@@ -147,9 +151,18 @@ struct PlanningPlayer: Player {
     void memoryTurnEnd(GameInfo& info){
         Undo undo;
         int enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, doubleAction, center, danger, assassin; 
+        bool didAssassin=false;
         for(int action: bestPlay){
             if(action>0&&action<5){info.occupy(action);}
             else info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, center, info.turn, enemyMemory, myfield, doubleAction, dangerMap, danger, assassin);
+            if(assassin>0){
+                didAssassin=true;
+            }
+        }
+        if(didAssassin){
+            assassinCount+=1;
+        }else{
+            assassinCount=0;
         }
         //print default infomations
         for(int i=0;i<6;i++){
