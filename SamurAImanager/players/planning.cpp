@@ -539,7 +539,7 @@ struct PlanningPlayer: Player {
 
 
         //anti-Assassin
-        if(info.turn<30){
+        if(info.turn<36){
             if(antiAssassinMode==0){
                 int tmp[4][2]={{2,2},{2,-2},{-2,2},{-2,-2}};
                 for(auto diff:tmp){
