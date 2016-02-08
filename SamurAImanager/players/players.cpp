@@ -436,17 +436,27 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
 
     //assasin
     for(int s=3; s<=5; s++) {
-        SamuraiInfo si = samuraiInfo[s];
+        SamuraiInfo& si = samuraiInfo[s];
         if(si.curX != -1 && si.curY != -1) {
+            int assassinPossibility=0;
+            int list[4][2]={{1,0},{0,1},{-1,0},{0,-1}};
+            for(auto diff:list){
+                int dx=si.curX+diff[0];
+                int dy=si.curY+diff[1];
+                if(dx<0||dy<0||dx>14||dy>14)continue;
+                if(isEnemyTerritory(me.curX,me.curY,weapon+3,dx,dy)){
+                    assassinPossibility+=1;
+                }
+            }
             if(si.curX == si.homeX && si.curY == si.homeY) {
                 if((reborn[s-3]-turn) >= 0 && (reborn[s-3]-turn)<=6 ){
-                    if(abs(me.curX - si.curX) == 2 && abs(me.curY - si.curY) == 2 && me.hidden == 1) {
-                        assassin++;
+                    if(assassinPossibility>0 && me.hidden == 1) {
+                        assassin+=assassinPossibility;
                     }
                 }
             }else{
-                if(abs(me.curX - si.curX) == 2 && abs(me.curY - si.curY) == 2 && me.hidden == 1) {
-                    assassin++;
+                if( assassinPossibility>0 && me.hidden == 1) {
+                    assassin+=assassinPossibility;
                 }
             }
         } 
