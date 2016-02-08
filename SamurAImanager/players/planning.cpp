@@ -610,6 +610,8 @@ struct PlanningPlayer: Player {
         }
         int minCost = 10;
         int minX, minY;
+        //red :2 blue:-2
+        int displace=2-4*info.side;
         for(int i=0; i<3; i++) {
             for(int j=0; j<3; j++) {
                 for(int k=0; k<5; k++) {
@@ -622,8 +624,8 @@ struct PlanningPlayer: Player {
                     if(enemyX[1] == i && enemyY[1] == j) { continue; }
                     if(enemyX[2] == i && enemyY[2] == j) { continue; }
                     minCost = tmp[i][j];
-                    myfield[0] = i*3+2;
-                    myfield[1] = j*3+2;
+                    myfield[0] = i*3+2+displace;
+                    myfield[1] = j*3+2-displace;
                 }
             }
         }
