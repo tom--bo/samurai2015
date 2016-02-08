@@ -32,6 +32,7 @@ int oldEnemyPostionY[3]={};
 int oldTurnNum=-1;
 int dangerMap[15][15]={0};
 int antiAssassinMode=0;
+bool isBeRespawnKill=false;
 #define injuryMAX 1.0
 #define hidingMAX 2.0
 #define avoidingMAX 1.0
@@ -112,6 +113,9 @@ struct PlanningPlayer: Player {
         static const int required[] = {0, 4, 4, 4, 4, 2, 2, 2, 2, 1, 1}; 
         for (int action = 1; action != 11; action++) {
             if (required[action] <= power && info.isValidAt(action, me.curX, me.curY, me.hidden)) {
+                
+                if(action>=5 && action<=8 &&isBeRespawnKill)continue;
+
                 currentPlay.push_back(action);
                 Undo undo;
                 int enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, doubleAction, center, danger, assassin;
@@ -164,6 +168,7 @@ struct PlanningPlayer: Player {
         updateMyField(info);
         setMerits(info.weapon);
         guessEnemyPostion(info);
+        isBeRespawnKill=isRespawnKilled(info);
         bestMerits = -5000;
         SamuraiInfo& me = info.samuraiInfo[info.weapon];
         for (int s = 3; s != 6; s++) {
@@ -180,6 +185,30 @@ struct PlanningPlayer: Player {
             cout << action << ' ';
         }
         memoryTurnEnd(info);
+    }
+
+    bool isRespawnKilled(GameInfo& info){
+        bool rebornNow=(info.turn-oldTurnNum)/12>0;
+        if(rebornNow || isBeRespawnKill){
+            int aroundAreaCnt=0;
+            int list[4][2]={{1,0},{0,1},{-1,0},{0,-1}};
+            SamuraiInfo& me=info.samuraiInfo[info.weapon];
+            for(auto diff:list){
+                int dx=me.homeX+diff[0];
+                int dy=me.homeY+diff[1];
+                if(dx<0||dy<0||dx>14||dy>14)continue;
+                if(info.field[dy*15+dx]>=3&&info.field[dy*15+dx]<=5){
+                   aroundAreaCnt+=1; 
+                }
+            }
+            if(aroundAreaCnt<=1){
+                return false;
+            }
+            cerr<<"resporn Kill Caution!!!!! at"<<info.turn<<" for player"<<info.weapon+info.side*3<<endl;
+            return true;
+        
+        }
+        return false;
     }
     
     void guessEnemyPostion(GameInfo& info){       
