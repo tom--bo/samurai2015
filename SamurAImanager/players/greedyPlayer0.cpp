@@ -24,7 +24,7 @@ void setMerits(int weaponid){
             centerMerits          =   50;
             doubleMerits          =  400;
             dangerMerits          =   40;
-            assassinMerits        =  180;
+            assassinMerits        =  100;
             respawnMerits         =   60;
             break;
         case 1:

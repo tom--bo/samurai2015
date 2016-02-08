@@ -448,6 +448,9 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
                     assassinPossibility+=1;
                 }
             }
+            if(assassinPossibility>2){
+                assassinPossibility=2;
+            }
             if(si.curX == si.homeX && si.curY == si.homeY) {
                 if((reborn[s-3]-turn) >= 0 && (reborn[s-3]-turn)<=6 ){
                     if(assassinPossibility>0 && me.hidden == 1) {

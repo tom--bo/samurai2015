@@ -43,7 +43,7 @@ bool shoudntMove=false;
 #define doubleActionMAX 1.0
 #define centerMAX 10.0
 #define dangerMAX 1.0
-#define assassinMAX 4.0
+#define assassinMAX 2.0
 #define respawnMAX 1.0
 
 void printParam(int i){
