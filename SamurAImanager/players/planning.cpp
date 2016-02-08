@@ -38,7 +38,7 @@ bool shoudntMove=false;
 
 #define injuryMAX 1.0
 #define hidingMAX 2.0
-#define avoidingMAX 1.0
+#define avoidingMAX 3.0
 #define movingMAX 1.0
 #define doubleActionMAX 1.0
 #define centerMAX 10.0

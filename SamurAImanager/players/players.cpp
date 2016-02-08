@@ -392,7 +392,6 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
     
     //check enemy attack area for avoiding
     //bool 
-    bool isDanger=false;
     for (int s = 3; s != 6; s++) {
         SamuraiInfo& si = samuraiInfo[s];
         if(si.curX==-1&&si.curY==-1)continue;
@@ -403,23 +402,19 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
         int diffy=abs(me.curY-si.curY);
         //axe
         if(s==5 && (diffx<=2 && diffy<=2) && diffx+diffy!=4 ){
-            isDanger=true;
+            avoiding--;
         }
         //sword
         if(s==4 && diffx+diffy<=3){
-            isDanger=true;
+            avoiding--;
         }
         //spear
         if(s==3 && diffx+diffy<=5 ){
             if(diffx==2&&diffy==2)continue;
             if(diffx==2&&diffy==3)continue;
             if(diffx==3&&diffy==2)continue;
-            isDanger=true;
+            avoiding--;
         }
-    }
- 
-    if(isDanger){
-        avoiding--;
     }
 
     //dangerMap
