@@ -120,6 +120,11 @@ struct PlanningPlayer: Player {
                 Undo undo;
                 int enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, doubleAction, center, danger, assassin;
                 info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, center, info.turn, enemyMemory, myfield, doubleAction, dangerMap, danger, assassin);
+                if((info.turns-info.turn)/6<1) {
+                    enemyTerritoryMerits  = 5000;
+                    friendTerritoryMerits = 2000;
+                    blankTerritoryMerits  = 1000;
+                }
                 double gain = enemyTerritoryMerits*enemyTerritory/territoryMax
                     + blankTerritoryMerits*blankTerritory/territoryMax
                     + friendTerritoryMerits*friendTerritory/territoryMax
