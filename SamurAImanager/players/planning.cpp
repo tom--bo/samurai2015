@@ -545,6 +545,13 @@ struct PlanningPlayer: Player {
                 tmpField[x][y] = -1;
             }
         }
+        int enemyX[3] = {};
+        int enemyY[3] = {};
+        for(int i=3; i<6; i++) {
+            SamuraiInfo si = info.samuraiInfo[i];
+            enemyX[i-3] = si.homeX/5;
+            enemyY[i-3] = si.homeY/5;
+        }
         int minCost = 10;
         int minX, minY;
         for(int i=0; i<3; i++) {
@@ -555,6 +562,9 @@ struct PlanningPlayer: Player {
                     }
                 }
                 if(minCost > tmp[i][j]) {
+                    if(enemyX[0] == i && enemyY[0] == j) { continue; }
+                    if(enemyX[1] == i && enemyY[1] == j) { continue; }
+                    if(enemyX[2] == i && enemyY[2] == j) { continue; }
                     minCost = tmp[i][j];
                     myfield[0] = i*3+2;
                     myfield[1] = j*3+2;
