@@ -21,7 +21,7 @@ void setMerits(int weaponid){
             avoidingMerits        =130;
             movingMerits          =  5;
             centerMerits          = 50;
-            doubleMerits          =200;
+            doubleMerits          =400;
             dangerMerits          = 40;
             assassinMerits        =100;
             break;
@@ -34,7 +34,7 @@ void setMerits(int weaponid){
             avoidingMerits        =130;
             movingMerits          =  5;
             centerMerits          = 15;
-            doubleMerits          =200;
+            doubleMerits          =400;
             dangerMerits          = 40;
             assassinMerits        =100;
             break;
@@ -47,7 +47,7 @@ void setMerits(int weaponid){
             avoidingMerits        =130;
             movingMerits          =  5;
             centerMerits          =  5;
-            doubleMerits          =200;
+            doubleMerits          =400;
             dangerMerits          = 40;
             assassinMerits        =100;
             break;
