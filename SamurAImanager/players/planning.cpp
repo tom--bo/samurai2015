@@ -136,7 +136,7 @@ struct PlanningPlayer: Player {
                 if(assassinCount>=2){
                     assassin=0;
                 }
-                if(info.turns-oldTurnNum<=12){
+                if(info.turn-oldTurnNum<=12){
                     respawn=0;
                 }
                 double gain = enemyTerritoryMerits*enemyTerritory/territoryMax

@@ -56,7 +56,7 @@ void setMerits(int weaponid){
             doubleMerits          =  400;
             dangerMerits          =   40;
             assassinMerits        =   30;
-            respawnMerits         =   60;
+            respawnMerits         =  1000;
             ventureMerits         =   40;
             break;
     }
