@@ -258,9 +258,9 @@ int GameInfo::getPointAroundHome(int x, int y) {
     return 0;
 }
 
-void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blankTerritory, int& friendTerritory, int& injury, int& hiding, int& avoiding, int& moving, int& center, int turn, int enemyMemory[100], int myfield[2], int& doubleAction, int dangerMap[15][15], int& danger, int& assassin, int& respawn) {
+void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blankTerritory, int& friendTerritory, int& injury, int& hiding, int& avoiding, int& moving, int& center, int turn, int enemyMemory[100], int myfield[2], int& doubleAction, int dangerMap[15][15], int& danger, int& assassin, int& respawn, int& venture) {
     SamuraiInfo& me = samuraiInfo[weapon];
-    enemyTerritory = blankTerritory = friendTerritory = injury = hiding = avoiding = moving = assassin = center = doubleAction = danger = respawn= 0;
+    enemyTerritory = blankTerritory = friendTerritory = injury = hiding = avoiding = moving = assassin = center = doubleAction = danger = respawn= venture = 0;
     switch (action) {
         case 1: case 2: case 3: case 4: { // occupation
             static const int aroundHomePoint = 3;
@@ -465,24 +465,38 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
         } 
     }
 
+    //venture
+    int massCount=0;
+    int fillArea=0;
+    for(int i=0;i<225;i++){
+        int x=i%15;
+        int y=i/15;
+        if(x==me.curX&&y==me.curY)continue;
+        if(abs(x-me.curX)<=1&&abs(y-me.curY)<=1){
+            massCount+=1;
+            if(field[i]>2){
+                fillArea++;
+            }
+        }
+    }
+    if(fillArea>=4){
+        venture=1;
+    }
+
     // add by position (closeness from center)
-    int diffCenter = abs(me.curX - 7) + abs(me.curY - 7);
+    int diffx=abs(me.curX - 7);
+    int diffy=abs(me.curY - 7);
+    int diffCenter = diffy;
+    if(diffx>diffy){
+        diffCenter=diffx;
+    }
     switch(diffCenter) {
-        case 0:  center+10; break;
-        case 1:  center+10; break;
-        case 2:  center+10; break;
-        case 3:  center+10; break;
-        case 4:  center+10; break;
-        case 5:  center+10; break;
-        case 6:  center+9 ; break;
-        case 7:  center+8 ; break;
-        case 8:  center+6 ; break;
-        case 9:  center+5 ; break;
-        case 10: center+4 ; break;
-        case 11: center+3 ; break;
-        case 12: center+2 ; break;
-        case 13: center+1 ; break;
-        case 14: center+0 ; break;
+        case 0:  center+=10; break;
+        case 1:  center+=10; break;
+        case 2:  center+=10; break;
+        case 3:  center+=10; break;
+        default:
+                 center+=0; break;
     }
 }
 bool GameInfo::isEnemyTerritory(int meX, int meY, int enemyID, int enemyX, int enemyY) {
@@ -505,11 +519,11 @@ bool GameInfo::isEnemyTerritory(int meX, int meY, int enemyID, int enemyX, int e
 
 void GameInfo::doAction(int action) {
     Undo dummy;
-    int dummy0, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8, dummy11, dummy13, dummy14, dummy15;
+    int dummy0, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8, dummy11, dummy13, dummy14, dummy15,dummy16;
     int dummy9[100] = {};
     int dummy10[2] = {};
     int dummy12[15][15]={};
-    tryAction(action, dummy, dummy0, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8, dummy9, dummy10, dummy11, dummy12, dummy13, dummy14, dummy15);
+    tryAction(action, dummy, dummy0, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8, dummy9, dummy10, dummy11, dummy12, dummy13, dummy14, dummy15, dummy16);
     cout << action << ' ';
 }
 

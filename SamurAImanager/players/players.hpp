@@ -68,7 +68,7 @@ struct GameInfo {
     bool isValid(int action) const;
     bool isValidAt(int action, int x, int y, int hidden) const;
     void occupy(int direction);
-    void tryAction(int action, Undo& undo, int& enemyTerritory, int& blankTerritory, int& friendTerritory, int& injury, int& hiding,int& avoiding, int& moving, int& center, int turn, int enemyMemory[100], int myfield[2], int& doubleAction, int dangerMap[15][15], int& danger, int& assasin, int& respawn);
+    void tryAction(int action, Undo& undo, int& enemyTerritory, int& blankTerritory, int& friendTerritory, int& injury, int& hiding,int& avoiding, int& moving, int& center, int turn, int enemyMemory[100], int myfield[2], int& doubleAction, int dangerMap[15][15], int& danger, int& assasin, int& respawn, int& venture);
     void doAction(int action);
     bool isEnemyTerritory(int meX, int meY, int enemyID, int enemyX, int enemyY); 
     int getPointAroundHome(int x, int y);

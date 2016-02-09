@@ -12,6 +12,7 @@ double centerMerits;
 double doubleMerits;
 double dangerMerits;
 double assassinMerits;
+double ventureMerits;
 
 double getIntFromFS(std::ifstream& ifs){
     std::string str;

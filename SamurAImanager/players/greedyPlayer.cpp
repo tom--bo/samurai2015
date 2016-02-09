@@ -9,6 +9,7 @@ double centerMerits;
 double doubleMerits;
 double dangerMerits;
 double assassinMerits;
+double ventureMerits;
 
 void setMerits(int weaponid){
     enemyTerritoryMerits  = 60;
