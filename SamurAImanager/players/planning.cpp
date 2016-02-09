@@ -30,6 +30,7 @@ int myfield[2] = {0};
 int oldMap[225];
 int oldEnemyPostionX[3]={};
 int oldEnemyPostionY[3]={};
+int oldEnemyHidden[3]={};
 int oldTurnNum=-1;
 int dangerMap[15][15]={0};
 int antiAssassinMode=0;
@@ -185,6 +186,8 @@ struct PlanningPlayer: Player {
         for(int id=3;id<6;id++){
             oldEnemyPostionX[id-3]=info.samuraiInfo[id].curX;
             oldEnemyPostionY[id-3]=info.samuraiInfo[id].curY;
+            oldEnemyHidden[id-3]=info.samuraiInfo[id].hidden;
+
         }
         oldTurnNum=info.turn;
 
@@ -274,6 +277,7 @@ struct PlanningPlayer: Player {
             for(int i=0;i<6;i++){
                 oldEnemyPostionX[i-3]=-1;
                 oldEnemyPostionY[i-3]=-1;
+                oldEnemyHidden[i-3]=1;
             }
             for(int i=0;i<225;i++){
                 oldMap[i]=9;
@@ -287,6 +291,7 @@ struct PlanningPlayer: Player {
                 if(isEnemyDoubled){
                     oldEnemyPostionX[i-3]=-1;
                     oldEnemyPostionY[i-3]=-1;
+                    oldEnemyHidden[i-3]=1;
                 }
                 else{
                     if(oldEnemyPostionX[i-3]==-1&&oldEnemyPostionY[i-3]==-1)continue;
@@ -373,6 +378,7 @@ struct PlanningPlayer: Player {
        
         //eliminate by oldFieldInfo
         for(int enemyId=3;enemyId<6;enemyId++){
+            if(oldEnemyHidden[enemyId-3]==0)continue;
             for(int j=0;j<225;j++){
                 int x=j%15;
                 int y=j/15;
