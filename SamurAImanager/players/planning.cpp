@@ -246,7 +246,7 @@ struct PlanningPlayer: Player {
     
     void guessEnemyPostion(GameInfo& info){       
         int turnOrder[6][2]={{0,7},{3,8},{4,11},{1,6},{2,9},{5,10}};
-        int TureTurnNum=info.turn;
+        int turnNum=info.turn;
         int playerIndex=info.weapon+3*info.side;
         int attackAreaNum[3]={16,12,8};
         int attackAreaX[3][16]={
@@ -270,13 +270,13 @@ struct PlanningPlayer: Player {
         for(int i=0;i<6;i++){
             ostringstream oss;
             oss<<"agent"<<i <<" "<<info.samuraiInfo[i].curX<<","<<info.samuraiInfo[i].curY;
-            printStr(playerIndex,TureTurnNum,oss.str().c_str());
+            printStr(playerIndex,turnNum,oss.str().c_str());
         }
-        printMap2(playerIndex,TureTurnNum,"real",info.field);
+        printMap2(playerIndex,turnNum,"real",info.field);
 
         //check for escape memory
         //if you dead, escape oldmap and oldEnemy
-        if((TureTurnNum-oldTurnNum)/12>0){
+        if((turnNum-oldTurnNum)/12>0){
             for(int i=0;i<6;i++){
                 oldEnemyPostionX[i-3]=-1;
                 oldEnemyPostionY[i-3]=-1;
@@ -290,7 +290,7 @@ struct PlanningPlayer: Player {
         for(int i=3;i<6;i++){
             if(i%3==info.weapon){
                 int isEnemyDoubled=0;
-                if((TureTurnNum%12)%2==1){isEnemyDoubled=1;}
+                if((turnNum%12)%2==1){isEnemyDoubled=1;}
                 if(isEnemyDoubled){
                     oldEnemyPostionX[i-3]=-1;
                     oldEnemyPostionY[i-3]=-1;
@@ -303,7 +303,7 @@ struct PlanningPlayer: Player {
                         SamuraiInfo& si=info.samuraiInfo[i];
                         if(si.curX==si.homeX&&si.curY==si.homeY)continue;//when enemy dead
                         continue;
-                        cerr<<"At turn"<<TureTurnNum <<" double action fill by old is Error!!!!"<<endl;
+                        cerr<<"At turn"<<turnNum <<" double action fill by old is Error!!!!"<<endl;
                         cerr<<"old: "<<oldEnemyPostionX[i-3]<<","<<oldEnemyPostionY[i-3]<<endl; 
                         cerr<<"now: "<<info.samuraiInfo[i].curX<<","<<info.samuraiInfo[i].curY<<endl;
                         continue;
@@ -323,7 +323,7 @@ struct PlanningPlayer: Player {
                 diffField[y][x]=info.field[i];
             }
         }
-        printMap(playerIndex,TureTurnNum,"diff",diffField);
+        printMap(playerIndex,turnNum,"diff",diffField);
 
 
         //fill enemy possible pos
@@ -354,9 +354,9 @@ struct PlanningPlayer: Player {
                 }
             }   
         }
-        printMap(playerIndex,TureTurnNum,"enemy3possible",possibleOccupyMap[0]);
-        printMap(playerIndex,TureTurnNum,"enemy4possible",possibleOccupyMap[1]);
-        printMap(playerIndex,TureTurnNum,"enemy5possible",possibleOccupyMap[2]);
+        printMap(playerIndex,turnNum,"enemy3possible",possibleOccupyMap[0]);
+        printMap(playerIndex,turnNum,"enemy4possible",possibleOccupyMap[1]);
+        printMap(playerIndex,turnNum,"enemy5possible",possibleOccupyMap[2]);
        
 
         //
@@ -375,9 +375,9 @@ struct PlanningPlayer: Player {
                 }
             }   
         }
-        printMap(playerIndex,TureTurnNum,"enemy3possible by oldEnemyPos",possibleOccupyMap[0]);
-        printMap(playerIndex,TureTurnNum,"enemy4possible by oldEnemyPos",possibleOccupyMap[1]);
-        printMap(playerIndex,TureTurnNum,"enemy5possible by oldEnemyPos",possibleOccupyMap[2]);
+        printMap(playerIndex,turnNum,"enemy3possible by oldEnemyPos",possibleOccupyMap[0]);
+        printMap(playerIndex,turnNum,"enemy4possible by oldEnemyPos",possibleOccupyMap[1]);
+        printMap(playerIndex,turnNum,"enemy5possible by oldEnemyPos",possibleOccupyMap[2]);
        
         //eliminate by oldFieldInfo
         for(int enemyId=3;enemyId<6;enemyId++){
@@ -399,9 +399,9 @@ struct PlanningPlayer: Player {
                 }
             }   
         }
-        printMap(playerIndex,TureTurnNum,"enemy3possible by oldField",possibleOccupyMap[0]);
-        printMap(playerIndex,TureTurnNum,"enemy4possible by oldField",possibleOccupyMap[1]);
-        printMap(playerIndex,TureTurnNum,"enemy5possible by oldField",possibleOccupyMap[2]);
+        printMap(playerIndex,turnNum,"enemy3possible by oldField",possibleOccupyMap[0]);
+        printMap(playerIndex,turnNum,"enemy4possible by oldField",possibleOccupyMap[1]);
+        printMap(playerIndex,turnNum,"enemy5possible by oldField",possibleOccupyMap[2]);
        
         //eliminate by empty field around
         const int size[3] = {4, 5, 7};
@@ -444,15 +444,15 @@ struct PlanningPlayer: Player {
                         }
                     }
                     if(noRealty){
-                        //cerr<<"by empty!!!!!!!!!! at "<<TureTurnNum<<endl;
+                        //cerr<<"by empty!!!!!!!!!! at "<<turnNum<<endl;
                         possibleOccupyMap[enemyId-3][y][x]=0;
                     }
                 } 
             }
         } 
-        printMap(playerIndex,TureTurnNum,"enemy3possible by emptyField",possibleOccupyMap[0]);
-        printMap(playerIndex,TureTurnNum,"enemy4possible by emptyField",possibleOccupyMap[1]);
-        printMap(playerIndex,TureTurnNum,"enemy5possible by emptyField",possibleOccupyMap[2]);
+        printMap(playerIndex,turnNum,"enemy3possible by emptyField",possibleOccupyMap[0]);
+        printMap(playerIndex,turnNum,"enemy4possible by emptyField",possibleOccupyMap[1]);
+        printMap(playerIndex,turnNum,"enemy5possible by emptyField",possibleOccupyMap[2]);
         
         
         //confirmEnemyPostion
@@ -478,7 +478,7 @@ struct PlanningPlayer: Player {
                         //if you can see enemy and not equaled to confirmXY, its error!!
                         if(si.curX!=confirmX||si.curY!=confirmY){
                             if(info.field[si.curX+si.curY*15]<3||info.field[si.curX+si.curY*15]==8)continue;
-                            //cerr<<"postion conflict error!!!! when t="<<TureTurnNum<<" enemy="<<enemyId<<std::endl;
+                            //cerr<<"postion conflict error!!!! when t="<<turnNum<<" enemy="<<enemyId<<std::endl;
                             printParam(playerIndex); 
                         }
                         continue;
@@ -487,8 +487,8 @@ struct PlanningPlayer: Player {
                     info.samuraiInfo[enemyId].curY=confirmY;
                     ostringstream oss;
                     oss<<"#define enemy"<<enemyId<<" to "<<confirmX<<","<<confirmY<<" by ocupyPos and oldEnemy";
-                    printStr(playerIndex,TureTurnNum,oss.str().c_str());
-                    //cerr<<playerIndex<<" "<<TureTurnNum<<" " << oss.str().c_str()<<std::endl; 
+                    printStr(playerIndex,turnNum,oss.str().c_str());
+                    //cerr<<playerIndex<<" "<<turnNum<<" " << oss.str().c_str()<<std::endl; 
                 }
             }
         }
@@ -543,13 +543,13 @@ struct PlanningPlayer: Player {
                 info.samuraiInfo[enemyId].curY=confirmY;
                 ostringstream oss;
                 oss<<"#define enemy"<<enemyId<<" to "<<confirmX<<","<<confirmY<<" by enemyPostionEliminate";
-                printStr(playerIndex,TureTurnNum,oss.str().c_str());
-                //cerr<<playerIndex<<" "<<TureTurnNum<<" " << oss.str().c_str()<<std::endl; 
+                printStr(playerIndex,turnNum,oss.str().c_str());
+                //cerr<<playerIndex<<" "<<turnNum<<" " << oss.str().c_str()<<std::endl; 
             }
         }
-        printMap(playerIndex,TureTurnNum,"enemy3estimate",possibleEnemyMap[0]);
-        printMap(playerIndex,TureTurnNum,"enemy4estimate",possibleEnemyMap[1]);
-        printMap(playerIndex,TureTurnNum,"enemy5estimate",possibleEnemyMap[2]);
+        printMap(playerIndex,turnNum,"enemy3estimate",possibleEnemyMap[0]);
+        printMap(playerIndex,turnNum,"enemy4estimate",possibleEnemyMap[1]);
+        printMap(playerIndex,turnNum,"enemy5estimate",possibleEnemyMap[2]);
        for(int j=0;j<225;j++){
             int x=j%15;
             int y=j/15;
@@ -571,7 +571,7 @@ struct PlanningPlayer: Player {
                 }
             } 
         }
-        printMap(playerIndex,TureTurnNum,"dangerMap",dangerMap);
+        printMap(playerIndex,turnNum,"dangerMap",dangerMap);
 
 
         //anti-Assassin
