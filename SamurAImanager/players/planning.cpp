@@ -36,7 +36,7 @@ int oldTurnNum=-1;
 int dangerMap[15][15]={0};
 int antiAssassinMode=0;
 int assassinCount=0;
-bool shoudntMove=false;
+bool shouldntMove=false;
 
 #define injuryMAX 1.0
 #define hidingMAX 4.0
@@ -122,16 +122,18 @@ struct PlanningPlayer: Player {
         for (int action = 1; action != 11; action++) {
             if (required[action] <= power && info.isValidAt(action, me.curX, me.curY, me.hidden)) {
                 
-                if(action>=5 && action<=8 &&shoudntMove)continue;
+                if(action>=5 && action<=8 &&shouldntMove)continue;
 
                 currentPlay.push_back(action);
                 Undo undo;
                 int enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, doubleAction, center, danger, assassin, respawn, venture;
                 info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, center, info.turn, enemyMemory, myfield, doubleAction, dangerMap, danger, assassin, respawn, venture);
                 if((info.turns-info.turn)/6<1) {
-                    enemyTerritoryMerits  = 5000;
-                    friendTerritoryMerits = 2000;
-                    blankTerritoryMerits  = 1000;
+                    enemyTerritoryMerits  = 50000;
+                    friendTerritoryMerits = 20000;
+                    blankTerritoryMerits  = 10000;
+                    assassinMerits        = 0;
+                    hidingMerits          = 0;
                 }
                 if(assassinCount>=2){
                     assassin=0;
@@ -190,7 +192,6 @@ struct PlanningPlayer: Player {
             oldEnemyPostionX[id-3]=info.samuraiInfo[id].curX;
             oldEnemyPostionY[id-3]=info.samuraiInfo[id].curY;
             oldEnemyHidden[id-3]=info.samuraiInfo[id].hidden;
-
         }
         oldTurnNum=info.turn;
 
@@ -200,7 +201,7 @@ struct PlanningPlayer: Player {
         updateMyField(info);
         setMerits(info.weapon);
         guessEnemyPostion(info);
-        shoudntMove=shouldNotMoveForRespawnKill(info);
+        shouldntMove=shouldNotMoveForRespawnKill(info);
         bestMerits = -5000;
         SamuraiInfo& me = info.samuraiInfo[info.weapon];
         for (int s = 3; s != 6; s++) {
@@ -222,7 +223,7 @@ struct PlanningPlayer: Player {
     bool shouldNotMoveForRespawnKill(GameInfo& info){
         if(info.weapon!=0)return false;
         bool rebornNow=(info.turn-oldTurnNum)/12>0;
-        if(rebornNow || shoudntMove){
+        if(rebornNow || shouldntMove){
             int aroundAreaCnt=0;
             int list[4][2]={{1,0},{0,1},{-1,0},{0,-1}};
             SamuraiInfo& me=info.samuraiInfo[info.weapon];

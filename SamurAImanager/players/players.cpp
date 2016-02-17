@@ -316,7 +316,6 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
                                 si.hidden = 0;
                             }
                         }
-
                     }
                 }
             }
