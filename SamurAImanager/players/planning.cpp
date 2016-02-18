@@ -130,8 +130,8 @@ struct PlanningPlayer: Player {
                 info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, center, info.turn, enemyMemory, myfield, doubleAction, dangerMap, danger, assassin, respawn, venture);
                 if((info.turns-info.turn)/6<1) {
                     enemyTerritoryMerits  = 50000;
-                    friendTerritoryMerits = 20000;
-                    blankTerritoryMerits  = 10000;
+                    friendTerritoryMerits = 15000;
+                    blankTerritoryMerits  = 40000;
                     assassinMerits        = 0;
                     hidingMerits          = 0;
                 }
