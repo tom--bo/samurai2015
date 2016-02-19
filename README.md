@@ -52,62 +52,58 @@
 
 
 ## Zoukin
-http://arena.ai-comp.net/contests/1/battle_results/19311
-槍：真ん中ウロウロがとにかくやばい
-殺すのとアサシンもいいけど塗る特典上げないとまずそう
+- http://arena.ai-comp.net/contests/1/battle_results/19311
+ - 槍：真ん中ウロウロがとにかくやばい
+ -  殺すのとアサシンもいいけど塗る特典上げないとまずそう
 
-http://arena.ai-comp.net/contests/1/battle_results/19308
-剣：アサシンしたり殺すことに固執しすぎ
+- http://arena.ai-comp.net/contests/1/battle_results/19308
+ - 剣：アサシンしたり殺すことに固執しすぎ
 
-http://arena.ai-comp.net/contests/1/battle_results/19302
-槍：まあまあいい感じ
-味方から離れるはあってもいいかも
-
-http://arena.ai-comp.net/contests/1/battle_results/19297
-剣：真ん中以降に行けてなさすぎ
-空白塗るメリット上げたほうが良さそう
-
-http://arena.ai-comp.net/contests/1/battle_results/19289
-剣：結構ヤバイ感じある
-運が悪いのでなければ敗因として重要そう
-
-http://arena.ai-comp.net/contests/1/battle_results/19288
-槍：序盤に自分の周辺塗ったほうが良かったのでは？
-味方から離れるは必須な気がする
-
-http://arena.ai-comp.net/contests/1/battle_results/19287
-味方からたまたま離れてたから良い感じになった気がする
-
-
-http://arena.ai-comp.net/contests/1/battle_results/19286
-剣：対同じ武器に対して弱いかも
-
-
-http://arena.ai-comp.net/contests/1/battle_results/19285
-剣：厳しい・味方だろうか？
-
-
-http://arena.ai-comp.net/contests/1/battle_results/19283
-斧：周辺が剣ならもう少し様子見たほうが良さそう
-respawnした後の行動に注意
-
-
-http://arena.ai-comp.net/contests/1/battle_results/19281
-斧：respawn後にはめられすぎ
-
-http://arena.ai-comp.net/contests/1/battle_results/19280
-槍：わからん味方か？
-
-http://arena.ai-comp.net/contests/1/battle_results/19279
-斧：respawn後にはめられすぎ
-
-http://arena.ai-comp.net/contests/1/battle_results/19278
-http://arena.ai-comp.net/contests/1/battle_results/19276
-http://arena.ai-comp.net/contests/1/battle_results/19275
-
-
-
-
-
+- http://arena.ai-comp.net/contests/1/battle_results/19302
+ - 槍：まあまあいい感じ
+ - 味方から離れるはあってもいいかも
+ 
+- http://arena.ai-comp.net/contests/1/battle_results/19297
+ - 剣：真ん中以降に行けてなさすぎ
+ - 空白塗るメリット上げたほうが良さそう
+- 
+- http://arena.ai-comp.net/contests/1/battle_results/19289
+ - 剣：結構ヤバイ感じある
+ - 運が悪いのでなければ敗因として重要そう
+ 
+- http://arena.ai-comp.net/contests/1/battle_results/19288
+ - 槍：序盤に自分の周辺塗ったほうが良かったのでは？
+ - 味方から離れるは必須な気がする
+ 
+- http://arena.ai-comp.net/contests/1/battle_results/19287
+ - 味方からたまたま離れてたから良い感じになった気がする
+ 
+ 
+- http://arena.ai-comp.net/contests/1/battle_results/19286
+ - 剣：対同じ武器に対して弱いかも
+ 
+ 
+- http://arena.ai-comp.net/contests/1/battle_results/19285
+ - 剣：厳しい・味方だろうか？
+ 
+ 
+- http://arena.ai-comp.net/contests/1/battle_results/19283
+ - 斧：周辺が剣ならもう少し様子見たほうが良さそう
+ - respawnした後の行動に注意
+ 
+ 
+- http://arena.ai-comp.net/contests/1/battle_results/19281
+ - 斧：respawn後にはめられすぎ
+ 
+- http://arena.ai-comp.net/contests/1/battle_results/19280
+ - 槍：わからん味方か？
+ 
+- http://arena.ai-comp.net/contests/1/battle_results/19279
+ - 斧：respawn後にはめられすぎ
+ 
+- http://arena.ai-comp.net/contests/1/battle_results/19278
+- http://arena.ai-comp.net/contests/1/battle_results/19276
+- http://arena.ai-comp.net/contests/1/battle_results/19275
+ 
 
 
