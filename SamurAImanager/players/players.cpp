@@ -226,7 +226,7 @@ int GameInfo::getPointAroundHome(int x, int y) {
         {0,2,2,1},
         {2,1,0,0},
         {2,1,0,0},
-        {1,1,0,0}
+        {2,1,0,0}
     };
     int pointMap1[5][5] = {
         {0,2,2,2,2},
@@ -236,8 +236,8 @@ int GameInfo::getPointAroundHome(int x, int y) {
         {2,0,0,0,0}
     };
     int pointMap2[4][4] = {
-        {0,2,2,0},
-        {2,2,2,0},
+        {0,2,2,2},
+        {2,2,2,2},
         {2,2,2,0},
         {2,2,2,0}
     };
@@ -252,6 +252,10 @@ int GameInfo::getPointAroundHome(int x, int y) {
         }
     }else if(weapon%3 == 2) {
         if(abs(me.homeX-x) <= 3 && abs(me.homeY-y) <= 3) {
+            int dir = (me.homeX-samuraiInfo[1].homeX)/abs(me.homeX-samuraiInfo[1].homeX);
+            if((x-me.homeX)*dir>0) {
+                return pointMap2[abs(me.homeY-y)][abs(me.homeX-x)]*3/2;
+            }
             return pointMap2[abs(me.homeY-y)][abs(me.homeX-x)];
         }
     }
