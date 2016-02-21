@@ -138,6 +138,9 @@ struct PlanningPlayer: Player {
                     assassinMerits        = 0;
                     hidingMerits          = 0;
                 }
+                if(info.turn < 36) {
+                    moving = 0;  
+                }
                 if(assassinCount>=2){
                     assassin=0;
                 }
