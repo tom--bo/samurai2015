@@ -277,9 +277,6 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
                 {1, 2, 3, 4},
                 {1, 2, 0, 1, 0},
                 {-1,0,1,1,-1,0,1}};
-            if(me.curX==me.homeX&&me.curY==me.homeY){
-                respawn=1;
-            }
             for (int k = 0; k != size[weapon]; k++) {
                 int x, y, distanceFromHome = 0;
                 rotate(action-1, ox[weapon][k], oy[weapon][k], x, y);
@@ -299,12 +296,18 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
                         int current = field[pos];
                         if (current != weapon) {
                             if (current >= 8) { // unoccupied
+                                if(me.curX==me.homeX&&me.curY==me.homeY){
+                                    respawn=1;
+                                }
                                 blankTerritory++;
                                 blankTerritory += getPointAroundHome(x, y);
                             } else if (current < 3) { // friends' territory
                                 friendTerritory++;
                                 friendTerritory += getPointAroundHome(x, y);
                             } else if (current >= 3) { // opponents' territory
+                                if(me.curX==me.homeX&&me.curY==me.homeY){
+                                    respawn=1;
+                                }
                                 enemyTerritory++;
                                 enemyTerritory += getPointAroundHome(x, y);
                             }

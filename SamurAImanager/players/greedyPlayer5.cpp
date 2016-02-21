@@ -23,13 +23,13 @@ void setMerits(int weaponid){
             hidingMerits          =   30;
             avoidingMerits        =  600;
             movingMerits          =   10;
-            centerMerits          =   50;
+            centerMerits          =    5;
             doubleMerits          =  400;
             dangerMerits          =   40;
             assassinMerits        =  100;
             respawnMerits         =   60;
             ventureMerits         =    0;
-            isolateMerits         =    0;
+            isolateMerits         =   30;
             break;
         case 1:
             enemyTerritoryMerits  =   60;
@@ -45,7 +45,7 @@ void setMerits(int weaponid){
             assassinMerits        =  100;
             respawnMerits         =   60;
             ventureMerits         =    0;
-            isolateMerits         =    0;
+            isolateMerits         =   30;
             break;
         case 2:
             enemyTerritoryMerits  =   60;
@@ -54,14 +54,14 @@ void setMerits(int weaponid){
             hurtingMerits         =10000;
             hidingMerits          =   30;
             avoidingMerits        =  600;
-            movingMerits          =    1;
+            movingMerits          =    4;
             centerMerits          =  -20;
             doubleMerits          =  400;
             dangerMerits          =   40;
             assassinMerits        =   30;
             respawnMerits         =   60;
             ventureMerits         =   40;
-            isolateMerits         =    0;
+            isolateMerits         =   30;
             break;
     }
 }
