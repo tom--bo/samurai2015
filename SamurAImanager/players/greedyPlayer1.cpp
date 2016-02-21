@@ -11,6 +11,7 @@ double dangerMerits;
 double assassinMerits;
 double respawnMerits;
 double ventureMerits;
+double isolateMerits;
 
 void setMerits(int weaponid){
     switch(weaponid%3) {
@@ -28,6 +29,7 @@ void setMerits(int weaponid){
             assassinMerits        =  100;
             respawnMerits         =   60;
             ventureMerits         =    0;
+            isolateMerits         =    0;
             break;
         case 1:
             enemyTerritoryMerits  =   60;
@@ -43,6 +45,7 @@ void setMerits(int weaponid){
             assassinMerits        =  100;
             respawnMerits         =   60;
             ventureMerits         =    0;
+            isolateMerits         =    0;
             break;
         case 2:
             enemyTerritoryMerits  =   60;
@@ -58,6 +61,7 @@ void setMerits(int weaponid){
             assassinMerits        =   30;
             respawnMerits         =   60;
             ventureMerits         =   40;
+            isolateMerits         =    0;
             break;
     }
 }

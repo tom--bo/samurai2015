@@ -13,6 +13,8 @@ double doubleMerits;
 double dangerMerits;
 double assassinMerits;
 double ventureMerits;
+double isolateMerits;
+double respawnMerits;
 
 double getIntFromFS(std::ifstream& ifs){
     std::string str;

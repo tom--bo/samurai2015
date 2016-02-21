@@ -19,6 +19,7 @@ extern double dangerMerits;
 extern double assassinMerits;
 extern double respawnMerits;
 extern double ventureMerits;
+extern double isolateMerits;
 
 extern void setMerits(int weaponid);
 
@@ -37,6 +38,7 @@ int dangerMap[15][15]={0};
 int antiAssassinMode=0;
 int assassinCount=0;
 bool shouldntMove=false;
+int beforeFriendAction[3][5] = {};
 
 #define injuryMAX 1.0
 #define hidingMAX 4.0
@@ -48,6 +50,7 @@ bool shouldntMove=false;
 #define assassinMAX 2.0
 #define respawnMAX 1.0
 #define ventureMAX 1.0
+#define isolateMAX 2.0
 
 void printParam(int i){
 return;
@@ -126,8 +129,8 @@ struct PlanningPlayer: Player {
 
                 currentPlay.push_back(action);
                 Undo undo;
-                int enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, doubleAction, center, danger, assassin, respawn, venture;
-                info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, center, info.turn, enemyMemory, myfield, doubleAction, dangerMap, danger, assassin, respawn, venture);
+                int enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, doubleAction, center, danger, assassin, respawn, venture, isolate;
+                info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, center, info.turn, enemyMemory, myfield, doubleAction, dangerMap, danger, assassin, respawn, venture, isolate);
                 if((info.turns-info.turn)/6<1) {
                     enemyTerritoryMerits  = 50000;
                     friendTerritoryMerits = 15000;
@@ -147,8 +150,9 @@ struct PlanningPlayer: Player {
                     + hurtingMerits*injury/injuryMAX
                     + hidingMerits*hiding/hidingMAX
                     + movingMerits*moving/movingMAX
-                    + doubleMerits*doubleAction/doubleActionMAX;
-                    + respawnMerits*respawn/respawnMAX; 
+                    + doubleMerits*doubleAction/doubleActionMAX
+                    + respawnMerits*respawn/respawnMAX 
+                    + isolateMerits*isolate/isolateMAX;
                 double board =
                     + centerMerits*center/centerMAX
                     + avoidingMerits*avoiding/avoidingMAX
@@ -163,11 +167,11 @@ struct PlanningPlayer: Player {
     }
     void memoryTurnEnd(GameInfo& info){
         Undo undo;
-        int enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, doubleAction, center, danger, assassin, respawn,venture; 
+        int enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, doubleAction, center, danger, assassin, respawn,venture, isolate; 
         bool didAssassin=false;
         for(int action: bestPlay){
             if(action>0&&action<5){info.occupy(action);}
-            else info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, center, info.turn, enemyMemory, myfield, doubleAction, dangerMap, danger, assassin, respawn, venture);
+            else info.tryAction(action, undo, enemyTerritory, blankTerritory, friendTerritory, injury, hiding, avoiding, moving, center, info.turn, enemyMemory, myfield, doubleAction, dangerMap, danger, assassin, respawn, venture, isolate);
             if(assassin>0){
                 didAssassin=true;
             }
@@ -325,6 +329,21 @@ struct PlanningPlayer: Player {
             }
         }
         printMap(playerIndex,turnNum,"diff",diffField);
+
+        for(int i=0; i<3; i++) {
+            for(int j=4; j>0; j--) {
+                beforeFriendAction[i][j] = beforeFriendAction[i][j-1];
+            }
+            beforeFriendAction[i][0] = 0;
+            if(i == info.weapon) continue;
+            for(int k=0;k<225;k++){
+                int x=k%15;
+                int y=k/15;
+                if(diffField[y][x] == i){
+                    beforeFriendAction[i][0]++;
+                }
+            }
+        }
 
 
         //fill enemy possible pos

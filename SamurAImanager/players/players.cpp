@@ -262,9 +262,9 @@ int GameInfo::getPointAroundHome(int x, int y) {
     return 0;
 }
 
-void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blankTerritory, int& friendTerritory, int& injury, int& hiding, int& avoiding, int& moving, int& center, int turn, int enemyMemory[100], int myfield[2], int& doubleAction, int dangerMap[15][15], int& danger, int& assassin, int& respawn, int& venture) {
+void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blankTerritory, int& friendTerritory, int& injury, int& hiding, int& avoiding, int& moving, int& center, int turn, int enemyMemory[100], int myfield[2], int& doubleAction, int dangerMap[15][15], int& danger, int& assassin, int& respawn, int& venture, int& isolate) {
     SamuraiInfo& me = samuraiInfo[weapon];
-    enemyTerritory = blankTerritory = friendTerritory = injury = hiding = avoiding = moving = assassin = center = doubleAction = danger = respawn= venture = 0;
+    enemyTerritory = blankTerritory = friendTerritory = injury = hiding = avoiding = moving = assassin = center = doubleAction = danger = respawn= venture = isolate = 0;
     switch (action) {
         case 1: case 2: case 3: case 4: { // occupation
             static const int aroundHomePoint = 3;
@@ -339,6 +339,23 @@ void GameInfo::tryAction(int action, Undo& undo,  int& enemyTerritory, int& blan
             afterDistance = abs(me.curX-myfield[0]) + abs(me.curY-myfield[1]);
             distance = beforeDistance - afterDistance;
             moving += distance;
+
+            //isolate
+            for(int s=0;s<3;s++){
+                if(s==weapon)continue;
+                int sum=0;
+                for(int k=0; k<4; k++) {
+                    sum += beforeFriendAction[s][k];
+                }
+                SamuraiInfo& si = samuraiInfo[s];
+                beforeDistance = abs(si.curX-oldX) + abs(si.curY-oldY); 
+                afterDistance = abs(si.curX-me.curX) + abs(si.curY-me.curY); 
+                if(afterDistance<=5 && sum>=8){
+                    distance = afterDistance - beforeDistance;
+                    isolate+=distance;
+                }
+            } 
+
 
             bool preInEnemyTerritory = false, nowInEnemyTerritory = false;
 
@@ -522,11 +539,11 @@ bool GameInfo::isEnemyTerritory(int meX, int meY, int enemyID, int enemyX, int e
 
 void GameInfo::doAction(int action) {
     Undo dummy;
-    int dummy0, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8, dummy11, dummy13, dummy14, dummy15,dummy16;
+    int dummy0, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8, dummy11, dummy13, dummy14, dummy15,dummy16, dummy17;
     int dummy9[100] = {};
     int dummy10[2] = {};
     int dummy12[15][15]={};
-    tryAction(action, dummy, dummy0, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8, dummy9, dummy10, dummy11, dummy12, dummy13, dummy14, dummy15, dummy16);
+    tryAction(action, dummy, dummy0, dummy1, dummy2, dummy3, dummy4, dummy5, dummy6, dummy7, dummy8, dummy9, dummy10, dummy11, dummy12, dummy13, dummy14, dummy15, dummy16,dummy17);
     cout << action << ' ';
 }
 

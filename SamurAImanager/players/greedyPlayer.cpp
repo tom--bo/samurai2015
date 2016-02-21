@@ -10,6 +10,8 @@ double doubleMerits;
 double dangerMerits;
 double assassinMerits;
 double ventureMerits;
+double respawnMerits;
+double isolateMerits;
 
 void setMerits(int weaponid){
     enemyTerritoryMerits  = 60;
