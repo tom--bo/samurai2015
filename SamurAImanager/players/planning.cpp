@@ -596,14 +596,16 @@ struct PlanningPlayer: Player {
         }
         printMap(playerIndex,turnNum,"dangerMap",dangerMap);
 
-
+        if(info.turn-oldTurnNum>12){
+            antiAssassinMode=0;
+        }
         //anti-Assassin
-        if(info.turn<36){
+        if(info.turn<36||(info.turn-oldTurnNum)>12){
             if(antiAssassinMode==0){
                 int tmp[4][2]={{2,2},{2,-2},{-2,2},{-2,-2}};
                 for(auto diff:tmp){
-                    int kx=info.samuraiInfo[playerIndex].curX+diff[0];
-                    int ky=info.samuraiInfo[playerIndex].curY+diff[1];
+                    int kx=info.samuraiInfo[info.weapon].curX+diff[0];
+                    int ky=info.samuraiInfo[info.weapon].curY+diff[1];
                     if(kx<0||ky<0||kx>14||ky>14)continue;
                     int color=info.field[ky*15+kx];
                     if(color>=3&&color<=5){
@@ -617,6 +619,8 @@ struct PlanningPlayer: Player {
             }else{
                 antiAssassinMode=0;
             }
+        }else{
+            antiAssassinMode=0;
         }
                 
             
