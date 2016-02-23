@@ -596,11 +596,9 @@ struct PlanningPlayer: Player {
         }
         printMap(playerIndex,turnNum,"dangerMap",dangerMap);
 
-        if(info.turn-oldTurnNum>12){
-            antiAssassinMode=0;
-        }
+        
         //anti-Assassin
-        if(info.turn<36||(info.turn-oldTurnNum)>12){
+        if(info.turn<36){
             if(antiAssassinMode==0){
                 int tmp[4][2]={{2,2},{2,-2},{-2,2},{-2,-2}};
                 for(auto diff:tmp){
